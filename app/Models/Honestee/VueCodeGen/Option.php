@@ -28,5 +28,12 @@ class Option extends Model
         ''
     ];
 
+
+    protected $fillable = [
+        'key', 'value',
+        'created_at',
+        'updated_at',
+    ];
+
  
 } ?>

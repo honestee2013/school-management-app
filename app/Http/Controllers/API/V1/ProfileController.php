@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\ChangePasswordRequest;
 use App\Http\Requests\Users\ProfileUpdateRequest;
-use App\Models\User;
+use App\Models\Honestee\VueCodeGen\User;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller

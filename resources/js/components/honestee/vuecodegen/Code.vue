@@ -238,9 +238,9 @@
                 <label>Max no. of use</label>
                 <select v-model="form.maximum_use" name="maximum_use" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'number_of_use' ) }">
-                  <option value="1">One time</option>
-                  <option value="3">Three times</option>
-                  <option value="5">Five times</option>
+                  <option value="One time">One time</option>
+                  <option value="Three times">Three times</option>
+                  <option value="Five times">Five times</option>
                 </select>
                 <has-error :form="form" field="number_of_use"></has-error>
 
@@ -406,10 +406,10 @@ export default {
       form: new Form({
         "id": "",
         "role_id": 9,
-        "code_type": "Token",
+        "code_type": "Pin",
         "use_for": "User registration",
         "expire_time": "After one week",
-        "maximum_use": 5,
+        "maximum_use": "Three times",
         "quantity": 5,
         "used_by": "",
         "number_of_use" : "",

@@ -18,10 +18,7 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-
         if (! $request->expectsJson()) {
-            //return Redirect::route("http://school1.localhost:8000");
-
             return route('login');
         }
     }

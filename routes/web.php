@@ -21,6 +21,7 @@ use  Spatie\Multitenancy\Landlord;
 
 use Spatie\Multitenancy\Models\Tenant;
 //use Option;
+use App\Models\Honestee\VueCodeGen\Option;
 
 //exit(App\Models\Honestee\VueCodeGen\Role::find(1)->name);
 
@@ -38,6 +39,12 @@ use Spatie\Multitenancy\Models\Tenant;
         //abort("404");
 
     // routes
+
+    ////Auth::logout();
+
+    //exit(json_encode( auth()->user() ));
+//exit( Option::all());
+
     Route::get('/', function () {
         return view('welcome');
     });
@@ -87,15 +94,16 @@ use Spatie\Multitenancy\Models\Tenant;
             return view('auth/school-students-registration');
         })->name('school-students-registration');      
     
-           
+     
 
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
         
         Route::get('home', function () {
             return redirect('/dashboard');
         });
-        
+     
         Route::get('/{vue_capture?}', function () {
             return view('home');
         })->where('vue_capture', '[\/\w\.-]*')->middleware('auth');
+
     });

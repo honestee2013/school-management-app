@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 //use App\Models\User;
 use App\Models\Honestee\VueCodeGen\User;
 //use App\Models\Honestee\VueCodeGen\Role;
+use App\Models\Honestee\VueCodeGen\Code;
+use App\Models\Honestee\VueCodeGen\Option;
+
 use Spatie\Permission\Models\Role;
 
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -70,7 +73,7 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
 
-        if($data['role'] = "school_owner")
+        if($data['role'] = "school-owner")
             $fields['website'] = 'unique:Spatie\Multitenancy\Models\Tenant,database';
 
         return Validator::make($data, $fields);
@@ -86,25 +89,51 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $role = $data['role'];
-        if($role == 'school-owner')
+        $code = null;
+        $roleName = $data['role'];
+        if($roleName == 'school-owner')
             $this->createTenantInfo($data['website']);
-        else
-            $role == Code::were("value", $data['pincode']);
+        else{
+            $code = Code::where("value", $data['pincode'])->first();
+            $this->exitForInvalidCode($code);
+            $roleName = $code->user_type;
+        }
 
+        $generalRoleName = "staff";
+        if( strpos($roleName, "student") > -1 || strpos($roleName, "prefect") > -1 || strpos($roleName, "class-head") > -1)
+            $generalRoleName = "student";
+        else if( strpos($roleName, "parent") )
+            $generalRoleName = "parent";
+       
+        // Generate user unique number
+        $userNumber = $this->createUserNumber($generalRoleName);
+
+        // Create a new user
         $userData = [
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'user_number' => $this->createUserNumber($role),
+            'user_number' => $userNumber,
         ];
-
         $user = User::create($userData);
 
         // Assigning Role by default user role
-        $role = Role::where('name', $data['role'])->first();
-        $user->assignRole($role);
-        
+        //$role = Role::where('name', $roleName)->first();
+        //$generalRole = Role::where('name', $generalRoleName)->first();
+        //$user->assignRole($role);
+        //$user->assignRole($generalRole); 
+
+        $user->syncRoles([$roleName, $generalRoleName]);
+
+        // Update the code information
+        if($roleName != 'school-owner'){
+            $code->status = "used";
+            $code->number_of_use = $code->number_of_use + 1;
+            $code->used_by = $userNumber;
+            $code->save();
+        }
+
+
         //$userNumber = $this->createUserNumber('STA'); // For staff
         //$user->update(['user_number', $userNumber]);
 
@@ -145,6 +174,24 @@ class RegisterController extends Controller
     }
 
 
+    protected function exitForInvalidCode($code){
+
+        if(!$code)
+            exit("<h4>Invalid code!</h4>");
+
+        $expiryDate = new \DateTime($code->expiry_date);
+        
+        if($code->use_for != "User registration")
+            exit("<h4>This code is for ".$code->use_for.", not for registration!</h4>");
+        else if(now() > $expiryDate )
+            exit("<h4>This code has reached its expiring date: ".$expiryDate->format('Y-m-d H:i:s')."</h4>");
+        else if( $code->number_of_use >= $code->maximum_use)
+            exit("<h4>This code has reached its maximum use of ".$code->maximum_use." times!</h4>");
+        else if( $code->used_by !=null)
+            exit("<h4>This code was used by ".$code->used_by."</h4>");
+    }
+
+
 
     protected function createTenantInfo($dbName){
 
@@ -182,22 +229,54 @@ class RegisterController extends Controller
 
     protected function createUserNumber($role) {
         $prefix = "STA";
-        if($role == "student")
-            $prefix = "STU";
-        else if($role == "parent")
+
+        if($role == "parent")
             $prefix = "PAR";
+        else if($role == "parent")
+            $prefix = "STU";
 
-        $lastUserNumber = option('lastUserNumber', 0);
-        $lastUserNumberYear = option('lastUserNumberYear', date('y'));
-        if($lastUserNumberYear < date('y')) // New year. Reset lastUserNumber
+        $lastUserNumber = Option::where('key', $prefix.'LastUserNumber')->first();
+        if($lastUserNumber)
+            $lastUserNumber = intval($lastUserNumber->value);
+
+        $lastUserNumberYear = Option::where('key', $prefix.'LastUserNumberYear')->first();
+        if($lastUserNumberYear)
+            $lastUserNumberYear = intval($lastUserNumberYear->value);
+
+        if(!$lastUserNumberYear)
+            $lastUserNumberYear = intval(date('y'));
+        if($lastUserNumberYear < intval(date('y'))) // New year. Reset lastUserNumber
             $lastUserNumber = 0;
-        
-        $lastUserNumber++; // Increase for new user number
 
-        option(['lastUserNumber' => $lastUserNumber]);
-        option(['lastUserNumberYear' => date('y')]);
+        $lastUserNumber = $lastUserNumber + 1 ; // Increase for new user number
+
+        $userNumber = $prefix.dechex(Tenant::current()->id)."-".str_pad($lastUserNumber, 3, '0', STR_PAD_LEFT);
+        //dd(User::where("user_number", $userNumber)->first());
+
+        if(User::where("user_number", $userNumber)->first()){
+            $lastUserNumber = $lastUserNumber + 1;
+            $userNumber = $prefix.dechex(Tenant::current()->id)."-".str_pad($lastUserNumber, 3, '0', STR_PAD_LEFT);
+        }
+
+        option([$prefix.'LastUserNumber' => intval($lastUserNumber)]);
+        option([$prefix.'LastUserNumberYear' => intval(date('y'))]);
+
+        return $userNumber;
     
-        return $prefix.dechex(Tenant::current()->id)."-".str_pad($lastUserNumber, 3, '0', STR_PAD_LEFT);
+    }
+
+
+    private function option($key, $value = null){
+        $opt = Option::where('key', $key)->first();
+        if($opt && !$value)
+            return $opt->value;
+        else if($opt && $value){
+            $opt->where("id", $opt->id)->update(["value" =>$value]);
+            return $value;
+        }else if(!$opt && $value){
+            Option::insert(['key' => $key, 'value' => $value]);
+            return $value;
+        }
     }
 
     
