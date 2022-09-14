@@ -205,7 +205,7 @@
                                                           </div>
                                                       <div class="form-group">
                                                                 <label>Name</label>
-                                  <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="name"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
@@ -215,22 +215,22 @@
                                                                                             </div>
                                                       <div class="form-group">
                                                                 <label>Phone no 1</label>
-                                  <input type="text" v-model="form.phone_no_1" name="phone_no_1" class="form-control" :class="{ 'is-invalid': form.errors.has( 'phone_no_1' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.phone_no_1" name="phone_no_1" class="form-control" :class="{ 'is-invalid': form.errors.has( 'phone_no_1' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="phone_no_1"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
                                                                 <label>Phone no 2</label>
-                                  <input type="text" v-model="form.phone_no_2" name="phone_no_2" class="form-control" :class="{ 'is-invalid': form.errors.has( 'phone_no_2' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.phone_no_2" name="phone_no_2" class="form-control" :class="{ 'is-invalid': form.errors.has( 'phone_no_2' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="phone_no_2"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
                                                                 <label>Email 1</label>
-                                  <input type="text" v-model="form.email_1" name="email_1" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email_1' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.email_1" name="email_1" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email_1' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="email_1"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
                                                                 <label>Email 2</label>
-                                  <input type="text" v-model="form.email_2" name="email_2" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email_2' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.email_2" name="email_2" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email_2' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="email_2"></has-error>
                                                                                             </div>
                                                       <div class="form-group">

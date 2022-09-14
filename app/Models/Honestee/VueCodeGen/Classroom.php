@@ -7,7 +7,6 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class Classroom extends Model
 {
-
     use UsesTenantConnection;
 
     /**

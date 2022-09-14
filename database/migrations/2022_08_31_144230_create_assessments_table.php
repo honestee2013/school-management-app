@@ -15,13 +15,16 @@ class CreateAssessmentsTable extends Migration
     {
         Schema::create('assessments', function (Blueprint $table) {
             $table->bigIncrements('id');
+
+            $table->bigInteger('section_id')->unsigned();
+            $table->bigInteger('classroom_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('subject_id')->unsigned();
 
             $table->enum('name', ['CA','Test','Exams']);
             $table->enum('year', ['2022','2023','2024','2025','2026','2027','2028','2029','2030']);
             $table->enum('term', ['First','Second','Third']);
-            $table->enum('sequence', ['First','Second','Third']);
+            $table->enum('type', ['First','Second','Third']);
             $table->float("score");
 
             $table->timestamps();

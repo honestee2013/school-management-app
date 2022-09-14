@@ -266,18 +266,7 @@ class RegisterController extends Controller
     }
 
 
-    private function option($key, $value = null){
-        $opt = Option::where('key', $key)->first();
-        if($opt && !$value)
-            return $opt->value;
-        else if($opt && $value){
-            $opt->where("id", $opt->id)->update(["value" =>$value]);
-            return $value;
-        }else if(!$opt && $value){
-            Option::insert(['key' => $key, 'value' => $value]);
-            return $value;
-        }
-    }
+
 
     
 

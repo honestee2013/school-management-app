@@ -207,16 +207,16 @@
                                                           </div>
                                                       <div class="form-group">
                                                                 <label>User number</label>
-                                  <input type="text" v-model="form.user_number" name="user_number" class="form-control" :class="{ 'is-invalid': form.errors.has( 'user_number' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.user_number" name="user_number" class="form-control" :class="{ 'is-invalid': form.errors.has( 'user_number' ) }"  maxlength="125" >
                                                                                             </div>
                                                       <div class="form-group">
                                                                 <label>Name</label>
-                                  <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="name"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
                                                                 <label>Email</label>
-                                  <input type="text" v-model="form.email" name="email" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.email" name="email" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="email"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
@@ -229,7 +229,7 @@
                                                                                             </div>
                                                       <div class="form-group">
                                                                 <label>Password</label>
-                                  <input type="password" v-model="form.password" name="password" class="form-control" :class="{ 'is-invalid': form.errors.has( 'password' ) }"  maxlength="255" >
+                                  <input type="password" v-model="form.password" name="password" class="form-control" :class="{ 'is-invalid': form.errors.has( 'password' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="password"></has-error>
                                     
 

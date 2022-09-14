@@ -207,7 +207,7 @@
                                                           </div>
                                                       <div class="form-group">
                                                                 <label>Name</label>
-                                  <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="255" >
+                                  <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="name"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
@@ -585,10 +585,10 @@
 
 
                           try{
-                              var url = "api/sections";
+                              var url = "api/sections?all=all";
                               axios.get( url ).then( sections  => {
-                                  if(sections.data.data.data){
-                                    this.sections = sections.data.data.data;
+                                  if(sections.data.data){
+                                    this.sections = sections.data.data;
                                   }
                               });
                           } catch(error){

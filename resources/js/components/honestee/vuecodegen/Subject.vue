@@ -21,12 +21,16 @@
                   <table class="table table-bordered" style="width: 100%; ">
                         <thead>
                             <tr>
-                                                                                                                                                              <th>Name</th>
+                                                                                                                                                              <th>Section Id</th>
+                                                                                                                                <th>Department Id</th>
+                                                                                                                                <th>Name</th>
                                                                                                                                                                                                                       </tr>   
                         </thead>
                         <tbody >
                             <tr v-for="(subject, index) in subjects" :key="subject.id">
-                                                                                                                                                                              <td>{{ subject.name }} </td>
+                                                                                                                                                                              <td>{{ subject.section_id }} </td>
+                                                                                                                                              <td>{{ subject.department_id }} </td>
+                                                                                                                                              <td>{{ subject.name }} </td>
                                                                                                                                                                                                                                         </tr>
                         </tbody>
                   </table>
@@ -192,6 +196,24 @@
                                  
                                   <input type="hidden" v-model="form.id"></input>
                               
+                                                          </div>
+                                                      <div class="form-group">
+                                                                <label>Section</label>
+                                  <select v-model="form.section_id" name="section_id" class="form-control" 
+                                          :class="{ 'is-invalid': form.errors.has( 'section_id' ) }">
+                                      <option v-for="(item, index)  in sections"
+                                            :key= "index" :value="item.id"> {{item.name}} </option>
+                                  </select>
+                                  
+                                                          </div>
+                                                      <div class="form-group">
+                                                                <label>Department</label>
+                                  <select v-model="form.department_id" name="department_id" class="form-control" 
+                                          :class="{ 'is-invalid': form.errors.has( 'department_id' ) }">
+                                      <option v-for="(item, index)  in departments"
+                                            :key= "index" :value="item.id"> {{item.name}} </option>
+                                  </select>
+                                  
                                                           </div>
                                                       <div class="form-group">
                                                                 <label>Name</label>
@@ -420,11 +442,19 @@
                 clickedRow: null,
                 selectedRows: [],
 
+
+                                                                                                sections: [],          
+                                                                                departments: [],          
+                                                                                                                                                
                 serverParams: {
                   columnFilters: {
                   },
                   sort: [
                                                                                                                       {"type" : "asc",
+                          "field" : "section_id"},
+                                                                                                {"type" : "asc",
+                          "field" : "department_id"},
+                                                                                                {"type" : "asc",
                           "field" : "name"},
                                                                                                                                                             ],
                   page: 1, 
@@ -434,19 +464,29 @@
                      
                 form: new Form({
                                         "id" : "",
+                                        "section_id" : "",
+                                        "department_id" : "",
                                         "name" : "",
                                         "created_at" : "",
                                         "updated_at" : "",
                                   }),
                 
                 table_heders: {
-                                                                                                  "Name" : "name",
+                                                                                                  "Section Id" : "section_id",
+                                                                                "Department Id" : "department_id",
+                                                                                "Name" : "name",
                                                                                                                                   },
 
                 columns: [ 
                                         { label : "Id",
                       field : "id",
                                               hidden : true},
+                                                              { label : "Section Id",
+                      field : "section_id",
+                                              hidden : false},
+                                                              { label : "Department Id",
+                      field : "department_id",
+                                              hidden : false},
                                                               { label : "Name",
                       field : "name",
                                               hidden : false},
@@ -704,7 +744,42 @@
                     return false;
                    else
                     return true;
-            }
+            },
+
+      
+                                                                            loadSections(){
+
+
+                          try{
+                              var url = "api/sections?all=all";
+                              axios.get( url ).then( sections  => {
+                                  if(sections.data.data){
+                                    this.sections = sections.data.data;
+                                  }
+                              });
+                          } catch(error){
+                            console.log(error.message);
+                          };
+
+                    },
+                                                                loadDepartments(){
+
+
+                          try{
+                              var url = "api/departments?all=all";
+                              axios.get( url ).then( departments  => {
+                                  if(departments.data.data){
+                                    this.departments = departments.data.data;
+                                  }
+                              });
+                          } catch(error){
+                            console.log(error.message);
+                          };
+
+                    },
+                                                                                                                
+
+
 
         },
 
@@ -713,7 +788,9 @@
             //console.log('Subject Component mounted.')
             this.$Progress.start();
             this.loadSubjects();
-            this.$Progress.finish();
+                                                                            this.loadSections();          
+                                                                this.loadDepartments();          
+                                                                                                                            this.$Progress.finish();
 
         },
 

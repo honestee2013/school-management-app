@@ -40,6 +40,13 @@ class SubjectController extends Controller
         }
         $this->authorize('isAdmin');
 
+        if(Str::plural($request->query('all', ''))){
+            $result = Subject::all();
+            return $this->sendResponse($result, 'Subjects list ');
+        }
+
+
+
         $page = $request->query('page', 1);
         $perPage = $request->query('perPage', '5');
         $sortType = $request->query('sortType', 'asc');
@@ -49,6 +56,8 @@ class SubjectController extends Controller
         $model = "App\Models\Honestee\VueCodeGen\\".ucfirst($request->query('pv_tbl', ''));
         $model_id = $request->query('pv_id', '');
         $relation = Str::plural($request->query('tbl', ''));
+
+
 
         if($model_id && $relation ){ // Many to Many relationships
             $query = $model::find($model_id)->{$relation}();
