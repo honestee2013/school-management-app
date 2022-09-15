@@ -59,6 +59,12 @@ use App\Models\Honestee\VueCodeGen\Option;
 
     Route::middleware('tenant')->group(function() {
 
+
+        Route::get('/constructions', function () {
+                return view('/constructions');
+        })->name('constructions');
+
+
         Route::get('/register', function () {
             $domain = Tenant::current()->domain;
             $isSubdomain = strrpos($domain, '.', 5 ); // Skip 5 char from the back ie .com

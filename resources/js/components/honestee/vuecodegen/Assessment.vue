@@ -439,6 +439,11 @@ export default {
       users: [],
       subjects: [],
 
+      selectedSectionId: 0,
+      selectedClassroomId: 0,
+      selectedUserId: 0,
+      selectedSubjectId: 0,
+
       serverParams: {
         columnFilters: {
         },

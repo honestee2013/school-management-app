@@ -35,6 +35,8 @@ export default [
 	{ path: '/options', component: require('./components/honestee/vuecodegen/Option.vue').default },
 
 	{ path: '/app-permissions', component: require('./components/honestee/vuecodegen/AppPermission.vue').default },
+	
+	{ path: '/under-construction', component: require('./components/honestee/vuecodegen/UnderConstruction.vue').default },
 
 	{ path: '*', component: require('./components/NotFound.vue').default },
 ];
