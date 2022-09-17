@@ -21,27 +21,23 @@
                   <table class="table table-bordered" style="width: 100%; ">
                         <thead>
                             <tr>
-                                                                                                                                                              <th>Name</th>
+                                                                                                                                                              <th>User Number</th>
+                                                                                                                                <th>Name</th>
                                                                                                                                 <th>Email</th>
-                                                                                                                                <th>User Number</th>
                                                                                                                                 <th>Parent Number</th>
-                                                                                                                                <th>Section Id</th>
-                                                                                                                                <th>Department Id</th>
-                                                                                                                                <th>Password</th>
                                                                                                                                 <th>Email Verified At</th>
+                                                                                                                                <th>Password</th>
                                                                                                                                 <th>Remember Token</th>
                                                                                                                                                                                                                       </tr>   
                         </thead>
                         <tbody >
                             <tr v-for="(user, index) in users" :key="user.id">
-                                                                                                                                                                              <td>{{ user.name }} </td>
+                                                                                                                                                                              <td>{{ user.user_number }} </td>
+                                                                                                                                              <td>{{ user.name }} </td>
                                                                                                                                               <td>{{ user.email }} </td>
-                                                                                                                                              <td>{{ user.user_number }} </td>
                                                                                                                                               <td>{{ user.parent_number }} </td>
-                                                                                                                                              <td>{{ user.section_id }} </td>
-                                                                                                                                              <td>{{ user.department_id }} </td>
-                                                                                                                                              <td>{{ user.password }} </td>
                                                                                                                                               <td>{{ user.email_verified_at }} </td>
+                                                                                                                                              <td>{{ user.password }} </td>
                                                                                                                                               <td>{{ user.remember_token }} </td>
                                                                                                                                                                                                                                         </tr>
                         </tbody>
@@ -210,6 +206,10 @@
                               
                                                           </div>
                                                       <div class="form-group">
+                                                                <label>User number</label>
+                                  <input type="text" v-model="form.user_number" name="user_number" class="form-control" :class="{ 'is-invalid': form.errors.has( 'user_number' ) }"  maxlength="125" >
+                                                                                            </div>
+                                                      <div class="form-group">
                                                                 <label>Name</label>
                                   <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="125" >
                                                                         <has-error :form="form" field="name"></has-error>
@@ -220,31 +220,13 @@
                                                                         <has-error :form="form" field="email"></has-error>
                                                                                             </div>
                                                       <div class="form-group">
-                                                                <label>User number</label>
-                                  <input type="text" v-model="form.user_number" name="user_number" class="form-control" :class="{ 'is-invalid': form.errors.has( 'user_number' ) }"  maxlength="125" >
-                                                                                            </div>
-                                                      <div class="form-group">
                                                                 <label>Parent number</label>
                                   <input type="number" v-model="form.parent_number" class="form-control" :class="{ 'is-invalid': form.errors.has( 'parent_number' ) }"></input>
                                                                                             </div>
                                                       <div class="form-group">
-                                                                <label>Section</label>
-                                  <select v-model="form.section_id" name="section_id" class="form-control" 
-                                          :class="{ 'is-invalid': form.errors.has( 'section_id' ) }">
-                                      <option v-for="(item, index)  in sections"
-                                            :key= "index" :value="item.id"> {{item.name}} </option>
-                                  </select>
-                                  
-                                                          </div>
-                                                      <div class="form-group">
-                                                                <label>Department</label>
-                                  <select v-model="form.department_id" name="department_id" class="form-control" 
-                                          :class="{ 'is-invalid': form.errors.has( 'department_id' ) }">
-                                      <option v-for="(item, index)  in departments"
-                                            :key= "index" :value="item.id"> {{item.name}} </option>
-                                  </select>
-                                  
-                                                          </div>
+                                                                <label>Email verified at</label>
+                                  <input type="number" v-model="form.email_verified_at" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email_verified_at' ) }"></input>
+                                                                                            </div>
                                                       <div class="form-group">
                                                                 <label>Password</label>
                                   <input type="password" v-model="form.password" name="password" class="form-control" :class="{ 'is-invalid': form.errors.has( 'password' ) }"  maxlength="125" >
@@ -252,10 +234,6 @@
                                     
 
                                                           </div>
-                                                      <div class="form-group">
-                                                                <label>Email verified at</label>
-                                  <input type="number" v-model="form.email_verified_at" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email_verified_at' ) }"></input>
-                                                                                            </div>
                                                       <div class="form-group">
                                                                 <label>Remember token</label>
                                   <input type="text" v-model="form.remember_token" name="remember_token" class="form-control" :class="{ 'is-invalid': form.errors.has( 'remember_token' ) }"  maxlength="100" >
@@ -335,29 +313,23 @@
                 selectedRows: [],
 
 
-                                                                                                                                                                                                                                                sections: [],          
-                                                                                departments: [],          
-                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                        
                 serverParams: {
                   columnFilters: {
                   },
                   sort: [
                                                                                                                       {"type" : "asc",
+                          "field" : "user_number"},
+                                                                                                {"type" : "asc",
                           "field" : "name"},
                                                                                                 {"type" : "asc",
                           "field" : "email"},
                                                                                                 {"type" : "asc",
-                          "field" : "user_number"},
-                                                                                                {"type" : "asc",
                           "field" : "parent_number"},
                                                                                                 {"type" : "asc",
-                          "field" : "section_id"},
-                                                                                                {"type" : "asc",
-                          "field" : "department_id"},
+                          "field" : "email_verified_at"},
                                                                                                 {"type" : "asc",
                           "field" : "password"},
-                                                                                                {"type" : "asc",
-                          "field" : "email_verified_at"},
                                                                                                 {"type" : "asc",
                           "field" : "remember_token"},
                                                                                                                                                             ],
@@ -368,28 +340,24 @@
                      
                 form: new Form({
                                         "id" : "",
+                                        "user_number" : "",
                                         "name" : "",
                                         "email" : "",
-                                        "user_number" : "",
                                         "parent_number" : "",
-                                        "section_id" : "",
-                                        "department_id" : "",
-                                        "password" : "",
                                         "email_verified_at" : "",
+                                        "password" : "",
                                         "remember_token" : "",
                                         "created_at" : "",
                                         "updated_at" : "",
                                   }),
                 
                 table_heders: {
-                                                                                                  "Name" : "name",
+                                                                                                  "User Number" : "user_number",
+                                                                                "Name" : "name",
                                                                                 "Email" : "email",
-                                                                                "User Number" : "user_number",
                                                                                 "Parent Number" : "parent_number",
-                                                                                "Section Id" : "section_id",
-                                                                                "Department Id" : "department_id",
-                                                                                "Password" : "password",
                                                                                 "Email Verified At" : "email_verified_at",
+                                                                                "Password" : "password",
                                                                                 "Remember Token" : "remember_token",
                                                                                                                                   },
 
@@ -397,29 +365,23 @@
                                         { label : "Id",
                       field : "id",
                                               hidden : true},
+                                                              { label : "User Number",
+                      field : "user_number",
+                                              hidden : false},
                                                               { label : "Name",
                       field : "name",
                                               hidden : false},
                                                               { label : "Email",
                       field : "email",
                                               hidden : false},
-                                                              { label : "User Number",
-                      field : "user_number",
-                                              hidden : false},
                                                               { label : "Parent Number",
                       field : "parent_number",
                                               hidden : false},
-                                                              { label : "Section Id",
-                      field : "section_id",
-                                              hidden : false},
-                                                              { label : "Department Id",
-                      field : "department_id",
+                                                              { label : "Email Verified At",
+                      field : "email_verified_at",
                                               hidden : false},
                                                               { label : "Password",
                       field : "password",
-                                              hidden : false},
-                                                              { label : "Email Verified At",
-                      field : "email_verified_at",
                                               hidden : false},
                                                               { label : "Remember Token",
                       field : "remember_token",
@@ -681,37 +643,7 @@
             },
 
       
-                                                                                                                                                                                            loadSections(){
-
-
-                          try{
-                              var url = "api/sections?all=all";
-                              axios.get( url ).then( sections  => {
-                                  if(sections.data.data){
-                                    this.sections = sections.data.data;
-                                  }
-                              });
-                          } catch(error){
-                            console.log(error.message);
-                          };
-
-                    },
-                                                                loadDepartments(){
-
-
-                          try{
-                              var url = "api/departments?all=all";
-                              axios.get( url ).then( departments  => {
-                                  if(departments.data.data){
-                                    this.departments = departments.data.data;
-                                  }
-                              });
-                          } catch(error){
-                            console.log(error.message);
-                          };
-
-                    },
-                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                    
 
 
 
@@ -722,9 +654,7 @@
             //console.log('User Component mounted.')
             this.$Progress.start();
             this.loadUsers();
-                                                                                                                                                                                            this.loadSections();          
-                                                                this.loadDepartments();          
-                                                                                                                                                                                    this.$Progress.finish();
+                                                                                                                                                                                                                                                                                                                this.$Progress.finish();
 
         },
 

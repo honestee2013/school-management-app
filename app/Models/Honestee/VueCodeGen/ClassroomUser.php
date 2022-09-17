@@ -2,13 +2,9 @@
 namespace App\Models\Honestee\VueCodeGen;
 
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
-
-class Section extends Model
+class ClassroomUser extends Model
 {
-
-    use UsesTenantConnection;
 
     /**
      * The attributes that should be hidden for arrays.
@@ -27,9 +23,6 @@ class Section extends Model
     protected $casts = [
         ''
     ];
-
-
-
 
  
 } ?>

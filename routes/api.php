@@ -60,3 +60,6 @@ Route::apiResources([ 'options' => 'App\Http\Controllers\Honestee\VueCodeGen\Opt
 Route::apiResources([ 'app-permissions' => 'App\Http\Controllers\Honestee\VueCodeGen\AppPermissionController' ]);
 
 
+
+Route::apiResources([ 'classroom-users' => 'App\Http\Controllers\Honestee\VueCodeGen\ClassroomUserController' ]);
+Route::apiResources([ 'user-classrooms' => 'App\Http\Controllers\Honestee\VueCodeGen\ClassroomUserController' ]);

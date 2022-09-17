@@ -3,6 +3,7 @@ namespace App\Models\Honestee\VueCodeGen;
 
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use App\Models\Honestee\VueCodeGen\User;
 
 
 class Classroom extends Model
@@ -26,6 +27,12 @@ class Classroom extends Model
     protected $casts = [
         ''
     ];
+
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
 
  
 } ?>

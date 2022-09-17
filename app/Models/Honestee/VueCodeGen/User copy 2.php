@@ -12,9 +12,6 @@ use Laravel\Passport\HasApiTokens;
 
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
-use App\Models\Honestee\VueCodeGen\Classroom;
-
-
 use Spatie\Permission\Traits\HasRoles;
 
 
@@ -65,13 +62,28 @@ class User extends Authenticatable // implements MustVerifyEmail
         return 'https://www.gravatar.com/avatar/' . md5(strtolower($this->email)) . '.jpg?s=200&d=mm';
     }
 
-
-    public function classrooms()
+    /*public function roles()
     {
-        return $this->belongsToMany(Classroom::class);
+        return $this->belongsToMany(Role::class);
     }
 
+    /**
+     * Assigning User role
+     *
+     * @param \App\Models\Role $role
+     * /
+    public function assignRole(Role $role)
+    {
+        return $this->roles()->save($role);
+    }
 
+    public function isAdmin()
+    {
+        return $this->roles()->where('name', 'Admin')->exists();
+    }
 
-   
+    public function isUser()
+    {
+        return $this->roles()->where('name', 'User')->exists();
+    }*/
 }

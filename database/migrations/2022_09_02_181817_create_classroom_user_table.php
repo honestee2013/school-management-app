@@ -13,7 +13,7 @@ class CreateClassroomUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('classroom__user', function (Blueprint $table) {
+        Schema::create('classroom_user', function (Blueprint $table) {
             $table->bigIncrements('id');
             
             $table->bigInteger('classroom_id')->unsigned();
@@ -32,6 +32,6 @@ class CreateClassroomUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('classroom__user');
+        Schema::dropIfExists('classroom_user');
     }
 }

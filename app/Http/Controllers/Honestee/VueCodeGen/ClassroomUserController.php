@@ -9,14 +9,14 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Schema;
 
-use App\Models\Honestee\VueCodeGen\Department;
+use App\Models\Honestee\VueCodeGen\ClassroomUser;
 
 
 use DB;
 use Str;
 
 
-class DepartmentController extends Controller
+class ClassroomUserController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -41,8 +41,8 @@ class DepartmentController extends Controller
         $this->authorize('isAdmin');
 
         if(Str::plural($request->query('all', ''))){
-            $result = Department::all();
-            return $this->sendResponse($result, 'Departments list ');
+            $result = ClassroomUser::all();
+            return $this->sendResponse($result, 'classroom_user list ');
         }
 
 
@@ -62,18 +62,18 @@ class DepartmentController extends Controller
         if($model_id && $relation ){ // Many to Many relationships
             $query = $model::find($model_id)->{$relation}();
         } else {
-            $query = Department::query();
+            $query = ClassroomUser::query();
         }
 
         if($request['searchTerm'])
             $query = $this->search($request, $query);
         
         if($sortField)
-            $departments = $query->orderBy($sortField, $sortType)->paginate( $perPage );
+            $classroom_user = $query->orderBy($sortField, $sortType)->paginate( $perPage );
         else       
-            $departments = $query->paginate( $perPage );
+            $classroom_user = $query->paginate( $perPage );
   
-        return $this->sendResponse($departments, 'Departments list ');
+        return $this->sendResponse($classroom_user, 'classroom_user list ');
     }
 
 
@@ -84,7 +84,7 @@ class DepartmentController extends Controller
         }
         $this->authorize('isAdmin');
 
-        $fields = Schema::getColumnListing('$departments');
+        $fields = Schema::getColumnListing('$classroom_user');
         foreach( $fields as $field) {
             $query = $query->orWhere($field, 'LIKE', '%'.$request['searchTerm']. '%');
         }
@@ -133,8 +133,8 @@ class DepartmentController extends Controller
             return $this->sendResponse($query, ucfirst($relation)." were attached to the ".ucfirst($request->query('pv_tbl', '')." Successfully"));
         } else {
             $this->checkValidation($request);
-            $department = Department::create($request->all());    
-            return $this->sendResponse( $department, 'Department Created Successfully');
+            $classroomuser = ClassroomUser::create($request->all());    
+            return $this->sendResponse( $classroomuser, 'ClassroomUser Created Successfully');
         }
 
 
@@ -143,7 +143,7 @@ class DepartmentController extends Controller
 
 
     public function checkValidation(Request $request){
-        $data = DB::select('DESCRIBE '.strtolower( 'Departments' ));
+        $data = DB::select('DESCRIBE '.strtolower( 'classroom_user' ));
         $validationInfo = array();
 
         foreach($data as $column){  // First array element as  Require field definition 
@@ -191,10 +191,10 @@ class DepartmentController extends Controller
     public function update(Request $request, $id)
     {
         $this->checkValidation($request);
-        $department = Department::findOrFail($id);
+        $classroomuser = ClassroomUser::findOrFail($id);
         $input = $request->all();
-        $department->fill($input)->save();
-        return $this->sendResponse($department, 'Department Information has been updated');
+        $classroomuser->fill($input)->save();
+        return $this->sendResponse($classroomuser, 'ClassroomUser Information has been updated');
     }
 
     /**
@@ -221,7 +221,7 @@ class DepartmentController extends Controller
             return $this->sendResponse($query, ucfirst($relation)." were detached from the ".ucfirst( $data['pv_tbl'] )." Successfully");
         } else {
             $idsArray = json_decode($parameters,true);
-            Department::whereIn('id', $idsArray)->delete();
+            ClassroomUser::whereIn('id', $idsArray)->delete();
             return $this->sendResponse($idsArray, "The record was deleted successfully.");
         }
     }

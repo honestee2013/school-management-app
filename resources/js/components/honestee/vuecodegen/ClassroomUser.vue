@@ -1,4 +1,4 @@
-<template>
+<template> 
   <section class="content">
         <!-- PDF Generator begins -->
         <html-pdf
@@ -7,7 +7,7 @@
             :enable-download="true"
             :preview-modal="true"
             :paginate-elements-by-height="14000"
-            filename="user_lists"
+            filename="classroom_lists"
             :pdf-quality="2"
             :manual-pagination="true"
             pdf-format="a4"
@@ -17,32 +17,18 @@
           >
               <section  id = "printPaper" slot="pdf-content" style=" width:100%; background-color: white;  padding: 0% 0.5% 40% 0.5%;">
                 <div style = "margin-left: 0; width: 100%; ">
-                  <h3 style="text-align:center; text-decoration: underline; padding: 1em; "> User Lists</h3>
+                  <h3 style="text-align:center; text-decoration: underline; padding: 1em; "> classroom Lists</h3>
                   <table class="table table-bordered" style="width: 100%; ">
                         <thead>
                             <tr>
-                                                                                                                                                              <th>Name</th>
-                                                                                                                                <th>Email</th>
-                                                                                                                                <th>User Number</th>
-                                                                                                                                <th>Parent Number</th>
-                                                                                                                                <th>Section Id</th>
-                                                                                                                                <th>Department Id</th>
-                                                                                                                                <th>Password</th>
-                                                                                                                                <th>Email Verified At</th>
-                                                                                                                                <th>Remember Token</th>
+                                                                                                                                                              <th>Section Id</th>
+                                                                                                                                <th>Name</th>
                                                                                                                                                                                                                       </tr>   
                         </thead>
                         <tbody >
-                            <tr v-for="(user, index) in users" :key="user.id">
-                                                                                                                                                                              <td>{{ user.name }} </td>
-                                                                                                                                              <td>{{ user.email }} </td>
-                                                                                                                                              <td>{{ user.user_number }} </td>
-                                                                                                                                              <td>{{ user.parent_number }} </td>
-                                                                                                                                              <td>{{ user.section_id }} </td>
-                                                                                                                                              <td>{{ user.department_id }} </td>
-                                                                                                                                              <td>{{ user.password }} </td>
-                                                                                                                                              <td>{{ user.email_verified_at }} </td>
-                                                                                                                                              <td>{{ user.remember_token }} </td>
+                            <tr v-for="(classroom, index) in classrooms" :key="classroom.id">
+                                                                                                                                                                              <td>{{ classroom.section_id }} </td>
+                                                                                                                                              <td>{{ classroom.name }} </td>
                                                                                                                                                                                                                                         </tr>
                         </tbody>
                   </table>
@@ -60,8 +46,11 @@
                 <!-- card header -->
                 <div class="card-header pr-sm-3">
                   <div class="d-flex mb-3">
-                    <h3 class="card-title mr-auto ">User List </h3>
-                    <button type="button" class="btn btn-sm btn-primary " @click="newModal">
+                    <h3 class="card-title mr-auto ">
+                      User classrooms 
+                    </h3>
+                    
+                    <button type="button" class="btn btn-sm btn-primary " @click="newModal" v-show="queryId">
                         <i class="fa fa-plus-square"></i>
                         Add New
                     </button>
@@ -70,8 +59,26 @@
 
                 <!-- card-body table container -->
                 <div class="card-body table-responsive p-2"> 
-                    <!-- VUE GOOD TABLE BEGINS -->  
+                    <div class="form-row mb-2">
+                        <div v-show="queryId" class="bg-light py-2 col-12 text-bold mb-2 pl-3" style="margin-top:-0.2em">
+                            Classrooms for <h5> {{selectedName}} </h5>
+                        </div>
+
+                        <div class="col">
+                            <select class="custom-select" v-model="queryId" @change="onQueryIdChanged($event, 'user' )">
+                              <option v-show = "(queryId==0)" selected value="0">Select user</option>
+                              <option v-if= "users" 
+                                      v-for = "row in users"  
+                                      :value="row.id+'_'+row.name"
+                                      :selected= "row.id == queryId"
+                                      >{{ row.name }}</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <!-- VUE GOOD TABLE BEGINS --> 
                     <vue-good-table
+                      v-show="queryId"
                       mode="remote"
                       @on-page-change="onPageChange"
                       @on-sort-change="onSortChange"
@@ -95,11 +102,11 @@
                         enabled: true,
                         placeholder: 'Search the table',
                       }"
-                      :rows="users"
+                      :rows="userClassrooms"
                       :columns="columns">
                           <!-- Vue Good TABLE CONTENTS and ACTIONS slot -->  
                           <div slot="table-actions">
-                              <!-- Button Groups for EXPORTING TABLE -->  
+                              <!-- Button Groups for EXPORTING TABLE - ->  
                               <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
                                 <div class="btn-group" role="group">
                                   <button id="btnGroupDrop1" type="button" class="btn btn-default btn-sm " data-toggle="dropdown" aria-expanded="false">
@@ -110,8 +117,8 @@
                                         <i class="fa fa-print mr-1"></i> Print
                                     </button>  
                                       <button href="#" class="dropdown-item">
-                                        <!-- JSON_EXCEL Component -->  
-                                        <json-excel class="" :data="users" :fields="table_heders" worksheet="User Lits" name="user_lists.xls">
+                                        <!-- JSON_EXCEL Component - ->  
+                                        <json-excel class="" :data="classrooms" :fields="table_heders" worksheet="classroom List" name="classroom_lists.xls">
                                             <i class="fa fa-file-excel mr-1"></i> Excel
                                         </json-excel>
                                     </button>
@@ -121,7 +128,6 @@
                                   </div>
                                 </div>
                               </div>
-
                               <!-- Button Groups for SHOWING/HIDING Columns -->  
                               <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
                                 <div class="btn-group" role="group">
@@ -138,23 +144,23 @@
                           </div><!-- Vue Good Table Action slot and contents ends --> 
                           
                           <div slot="emptystate">
-                            No {{$data['singular_lower']}} records found
+                            No classroom records found
                           </div>
 
                           <!-- Vue Good TABLE ACTION COLUMN options -->  
                           <template slot="table-row" slot-scope="props">
                             <span v-if="props.column.field == 'action'">
                               <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-primary"  @click="userDetail(props)">Detail</button>
+                                <button type="button" class="btn btn-sm btn-primary"  @click="classroomDetail(props)">Detail</button>
                                 <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
                                   <span class="sr-only">Toggle Dropdown</span>
                                 </button>
 
                                 <div class="dropdown-menu">
-                                  <!--<a class="dropdown-item" href="#" @click="userDetail('show')"><i class="fa fa-eye"> <span style="margin-left:0.1em"> Details </span> </i></a>
+                                  <!--<a class="dropdown-item" href="#" @click="classroomDetail('show')"><i class="fa fa-eye"> <span style="margin-left:0.1em"> Details </span> </i></a>
                                   <div class="dropdown-divider"></div>-->
-                                  <a class="dropdown-item" href="#" @click="editModal(props.row)"><i class="fa fa-edit">  <span style="margin-left:0.1em"> Edit </span>  </i></a>
-                                  <a class="dropdown-item " href="#" @click="deleteUser(props.row.id)"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Delete </span>  </i></a>
+                                  <!--<a class="dropdown-item" href="#" @click="editModal(props.row)"><i class="fa fa-edit">  <span style="margin-left:0.1em"> Edit </span>  </i></a>-->
+                                  <a class="dropdown-item " href="#" @click="deleteUserClassrooms(props.row.id)"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Remove </span>  </i></a>
                                 </div>
                               </div>
                             </span>
@@ -167,18 +173,19 @@
                           <div slot="selected-row-actions">
                               <div class="dropdown">
                                   <button class="btn btn-sm btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-                                    Selected Users
+                                    Selected classrooms
                                   </button>
                                   <div class="dropdown-menu">
-                                    <a class="dropdown-item " href="#" @click="deleteSelectedUsers()"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Delete </span>  </i></a>
+                                    <a class="dropdown-item " href="#" @click="deleteSelectedClassrooms()"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Remove </span>  </i></a>
                                   </div>
                                 </div>
                           </div>
                     </vue-good-table>
+
                 </div> <!-- card-body table container ends -->
 
                 <div class="card-footer">
-                    <!--<pagination :data="users" @pagination-change-page="getResults"></pagination>-->
+                    <!--<pagination :data="classrooms" @pagination-change-page="getResults"></pagination>-->
                 </div>
               </div> <!-- /.card ends-->
           </div> <!-- /.row ends-->
@@ -194,87 +201,46 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header"> <!-- Modal Header -->
-                      <h5 class="modal-title" v-show="!editmode">New User</h5>
-                      <h5 class="modal-title" v-show="editmode">Update User</h5>
+                      <h5 class="modal-title" v-show="!editmode">Add classrooms</h5>
+                      <h5 class="modal-title" v-show="editmode">Update classrooms</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
                   </div>
 
                   <!-- <form @submit.prevent="createModel"> -->
-                  <form @submit.prevent="editmode ? updateUser() : createUser()">
+                  <form @submit.prevent="editmode ? updateUserClassrooms() : createUserClassrooms()">
                     <div class="modal-body">
-                                                    <div class="form-group">
-                                 
-                                  <input type="hidden" v-model="form.id"></input>
-                              
-                                                          </div>
-                                                      <div class="form-group">
-                                                                <label>Name</label>
-                                  <input type="text" v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }"  maxlength="125" >
-                                                                        <has-error :form="form" field="name"></has-error>
-                                                                                            </div>
-                                                      <div class="form-group">
-                                                                <label>Email</label>
-                                  <input type="text" v-model="form.email" name="email" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email' ) }"  maxlength="125" >
-                                                                        <has-error :form="form" field="email"></has-error>
-                                                                                            </div>
-                                                      <div class="form-group">
-                                                                <label>User number</label>
-                                  <input type="text" v-model="form.user_number" name="user_number" class="form-control" :class="{ 'is-invalid': form.errors.has( 'user_number' ) }"  maxlength="125" >
-                                                                                            </div>
-                                                      <div class="form-group">
-                                                                <label>Parent number</label>
-                                  <input type="number" v-model="form.parent_number" class="form-control" :class="{ 'is-invalid': form.errors.has( 'parent_number' ) }"></input>
-                                                                                            </div>
-                                                      <div class="form-group">
-                                                                <label>Section</label>
-                                  <select v-model="form.section_id" name="section_id" class="form-control" 
-                                          :class="{ 'is-invalid': form.errors.has( 'section_id' ) }">
-                                      <option v-for="(item, index)  in sections"
-                                            :key= "index" :value="item.id"> {{item.name}} </option>
-                                  </select>
-                                  
-                                                          </div>
-                                                      <div class="form-group">
-                                                                <label>Department</label>
-                                  <select v-model="form.department_id" name="department_id" class="form-control" 
-                                          :class="{ 'is-invalid': form.errors.has( 'department_id' ) }">
-                                      <option v-for="(item, index)  in departments"
-                                            :key= "index" :value="item.id"> {{item.name}} </option>
-                                  </select>
-                                  
-                                                          </div>
-                                                      <div class="form-group">
-                                                                <label>Password</label>
-                                  <input type="password" v-model="form.password" name="password" class="form-control" :class="{ 'is-invalid': form.errors.has( 'password' ) }"  maxlength="125" >
-                                                                        <has-error :form="form" field="password"></has-error>
-                                    
 
-                                                          </div>
-                                                      <div class="form-group">
-                                                                <label>Email verified at</label>
-                                  <input type="number" v-model="form.email_verified_at" class="form-control" :class="{ 'is-invalid': form.errors.has( 'email_verified_at' ) }"></input>
-                                                                                            </div>
-                                                      <div class="form-group">
-                                                                <label>Remember token</label>
-                                  <input type="text" v-model="form.remember_token" name="remember_token" class="form-control" :class="{ 'is-invalid': form.errors.has( 'remember_token' ) }"  maxlength="100" >
-                                                                                            </div>
-                                                      <div class="form-group">
-                                 
-                                  <input type="hidden" v-model="form.created_at"></input>
-                              
-                                                          </div>
-                                                      <div class="form-group">
-                                 
-                                  <input type="hidden" v-model="form.updated_at"></input>
-                              
-                                                          </div>
-                                              </div><!-- Modal body ends -->
+                        <div class="card border-light w-100" >
+                          <div class="card-header">
+                            Select classrooms for <h5> {{selectedName}} </h5>
+                          </div>
+                          <ul class="list-group list-group-flush">
+
+                            <li class="list-group-item bg-light">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="select_all" v-on:change="onSelectAll()">
+                                <label class="form-check-label" for="select_all" > All classrooms </label>
+                              </div>
+                            </li> 
+                          
+                          
+                          
+                            <li v-for="row in classrooms" class="list-group-item">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" :value="row.id" :id="row.id" v-model="checkedClassrooms">
+                                <label class="form-check-label" :for="row.id"> {{row.name}}</label>
+                              </div>
+                            </li>  
+                          </ul>
+                        </div>
+
+                    </div><!-- Modal body ends -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button v-show="editmode" type="submit" class="btn btn-success">Update</button>
-                        <button v-show="!editmode" type="submit" class="btn btn-primary">Create</button>
+                        <button v-show="!editmode" type="submit" class="btn btn-primary"> OK </button>
                     </div>
                   </form> <!-- Form Ends -->
                 </div>
@@ -282,11 +248,11 @@
         </div>
 
         <!-- Detail Modal -->
-        <div class="modal fade" id="userDetail" tabindex="-1" role="dialog" aria-labelledby="userDetail" aria-hidden="true">
+        <div class="modal fade" id="classroomDetail" tabindex="-1" role="dialog" aria-labelledby="classroomDetail" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header"> <!-- Modal Header -->
-                        <h5 class="modal-title" > User Detail</h5>
+                        <h5 class="modal-title" > Classroom Detail</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -301,10 +267,10 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" 
                         data-dismiss="modal" 
-                        @click="deleteUser(clickedRow.id)"><i class="fa fa-trash"></i> Delete </button>
-                        <button type="button" class="btn btn-primary" 
+                        @click="deleteUserClassrooms(clickedRow.id)"><i class="fa fa-trash"></i> Remove </button>
+                        <!--<button type="button" class="btn btn-primary" 
                         data-dismiss="modal" 
-                        @click="editModal(clickedRow)"><i class="fa fa-edit"></i> Edit</button>
+                        @click="editModal(clickedRow)"><i class="fa fa-edit"></i> Edit</button>-->
                         <button type="button" class="btn btn-primary" 
                         data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
                                                           
@@ -326,40 +292,30 @@
         data () {
             return {
                 editmode: false,
+                userClassrooms : [],
+                classrooms : [],
                 users : [],
+                checkedClassrooms : [],
                 search : '',
+                selectAll: false,
 
                 isLoading: false,
                 totalRecords: 0,
                 clickedRow: null,
                 selectedRows: [],
+                selectedRows: [],
+                queryId: 0,
+                selectedName: "",
+                queryTable: "",
 
-
-                                                                                                                                                                                                                                                sections: [],          
-                                                                                departments: [],          
-                                                                                                                                                                                                                        
                 serverParams: {
                   columnFilters: {
                   },
                   sort: [
                                                                                                                       {"type" : "asc",
-                          "field" : "name"},
-                                                                                                {"type" : "asc",
-                          "field" : "email"},
-                                                                                                {"type" : "asc",
-                          "field" : "user_number"},
-                                                                                                {"type" : "asc",
-                          "field" : "parent_number"},
-                                                                                                {"type" : "asc",
                           "field" : "section_id"},
                                                                                                 {"type" : "asc",
-                          "field" : "department_id"},
-                                                                                                {"type" : "asc",
-                          "field" : "password"},
-                                                                                                {"type" : "asc",
-                          "field" : "email_verified_at"},
-                                                                                                {"type" : "asc",
-                          "field" : "remember_token"},
+                          "field" : "name"},
                                                                                                                                                             ],
                   page: 1, 
                   perPage: 5,
@@ -368,61 +324,26 @@
                      
                 form: new Form({
                                         "id" : "",
-                                        "name" : "",
-                                        "email" : "",
-                                        "user_number" : "",
-                                        "parent_number" : "",
                                         "section_id" : "",
-                                        "department_id" : "",
-                                        "password" : "",
-                                        "email_verified_at" : "",
-                                        "remember_token" : "",
+                                        "name" : "",
                                         "created_at" : "",
                                         "updated_at" : "",
                                   }),
                 
                 table_heders: {
-                                                                                                  "Name" : "name",
-                                                                                "Email" : "email",
-                                                                                "User Number" : "user_number",
-                                                                                "Parent Number" : "parent_number",
-                                                                                "Section Id" : "section_id",
-                                                                                "Department Id" : "department_id",
-                                                                                "Password" : "password",
-                                                                                "Email Verified At" : "email_verified_at",
-                                                                                "Remember Token" : "remember_token",
+                                                                                                  "Section Id" : "section_id",
+                                                                                "Name" : "name",
                                                                                                                                   },
 
                 columns: [ 
                                         { label : "Id",
                       field : "id",
                                               hidden : true},
-                                                              { label : "Name",
-                      field : "name",
-                                              hidden : false},
-                                                              { label : "Email",
-                      field : "email",
-                                              hidden : false},
-                                                              { label : "User Number",
-                      field : "user_number",
-                                              hidden : false},
-                                                              { label : "Parent Number",
-                      field : "parent_number",
-                                              hidden : false},
                                                               { label : "Section Id",
                       field : "section_id",
                                               hidden : false},
-                                                              { label : "Department Id",
-                      field : "department_id",
-                                              hidden : false},
-                                                              { label : "Password",
-                      field : "password",
-                                              hidden : false},
-                                                              { label : "Email Verified At",
-                      field : "email_verified_at",
-                                              hidden : false},
-                                                              { label : "Remember Token",
-                      field : "remember_token",
+                                                              { label : "Name",
+                      field : "name",
                                               hidden : false},
                                                               { label : "Created At",
                       field : "created_at",
@@ -452,15 +373,15 @@
                                
         methods: {
 
-            userDetail(params){
+            classroomDetail(params){
               this.clickedRow = params.row;
-              $('#userDetail').modal('show');
+              $('#classroomDetail').modal('show');
             },
 
-            updateUser(){
+            updateUserClassrooms(){
                 this.$Progress.start();
                 // console.log('Editing data');
-                this.form.put('api/users/'+this.form.id)
+                this.form.put("api/classroom-users/"+this.form.id)
                 .then((response) => {
                     // success
                     $('#addNew').modal('hide');
@@ -470,7 +391,7 @@
                     });
                     this.$Progress.finish();
                         //  Fire.$emit('AfterCreate');
-                    this.loadUsers();
+                    this.loadUserClassrooms();
                 })
                 .catch(() => {
                     Toast.fire({
@@ -481,20 +402,22 @@
                 });
             },
 
-            editModal(user){
+            editModal(classroom){
+                this.loadClassrooms();
                 this.editmode = true;
                 this.form.reset();
                 $('#addNew').modal('show');
-                this.form.fill(user);
+                this.form.fill(classroom);
             },
 
             newModal(){
+                this.loadClassrooms();
                 this.editmode = false;
                 this.form.reset();
                 $('#addNew').modal('show');
             },
 
-            deleteUser(id){
+            deleteUserClassrooms(id){
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -505,15 +428,22 @@
                     }).then((result) => {
                         // Send request to the server
                          if (result.value) {
-                                const theData = [id];
-                                this.form.delete('api/users/'+JSON.stringify(theData) ).then(()=>{
+   
+                              var parameters = new Object();
+                              parameters["tbl"] = "classroom";
+                              parameters["pv_tbl"] = this.queryTable;
+                              parameters["pv_id"] = this.queryId;
+                              parameters["pv_ids"] = id;//this.checkedClassrooms;
+                         
+                                //const theData = [id];
+                                axios.delete('api/classroom-users/'+JSON.stringify(parameters) ).then(()=>{
                                         Swal.fire(
                                         'Deleted!',
-                                        'The user was deleted successfully.',
+                                        'The classroom was deleted successfully.',
                                         'success'
                                         );
                                     // Fire.$emit('AfterCreate');
-                                    this.loadUsers();
+                                    this.loadUserClassrooms();
                                 }).catch((data)=> {
                                   Swal.fire("Failed!", data.message, "warning");
                               });
@@ -521,10 +451,10 @@
                     })
             },
 
-            deleteSelectedUsers(){
+            deleteSelectedClassrooms(){
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "Delete "+this.selectedRows.length+" records? You won't be able to revert this!",
+                    text: "Remove "+this.selectedRows.length+" records? You won't be able to revert this!",
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
@@ -532,15 +462,24 @@
                     }).then((result) => {
                         // Send request to the server
                          if (result.value) {
-                                let theData = JSON.stringify(this.selectedRows);
-                                this.form.delete('api/users/'+theData).then(()=>{
+
+                              var parameters = new Object();
+                              parameters["tbl"] = "classroom";
+                              parameters["pv_tbl"] = this.queryTable;
+                              parameters["pv_id"] = this.queryId;
+                              parameters["pv_ids"] = this.selectedRows;//this.checkedClassrooms;
+                         
+
+
+                                let theData = JSON.stringify( parameters );
+                                axios.delete("api/classroom-users/"+theData).then(()=>{
                                         Swal.fire(
                                         'Deleted!',
-                                        'The user was deleted successfully.',
+                                        'The classroom was deleted successfully.',
                                         'success'
                                         );
                                     // Fire.$emit('AfterCreate');
-                                    this.loadUsers();
+                                    this.loadUserClassrooms();
                                 }).catch((data)=> {
                                   Swal.fire("Failed!", data.message, "warning");
                               });
@@ -549,8 +488,14 @@
             },
             
 
-            createUser(){
-                this.form.post('api/users')
+            createUserClassrooms(){
+                var parameters = "?tbl=classroom";
+                parameters = parameters + "&pv_tbl="+this.queryTable;
+                parameters = parameters + "&pv_id="+this.queryId;
+                parameters = parameters + "&pv_ids="+this.checkedClassrooms;
+                var url = "api/classroom-users"+parameters;
+                
+                axios.post(url)
                 .then((response)=>{
                     $('#addNew').modal('hide');
                     Toast.fire({
@@ -558,7 +503,7 @@
                           title: response.data.message
                     });
                     this.$Progress.finish();
-                    this.loadUsers();
+                    this.loadUserClassrooms();
                 })
                 .catch(()=>{
                     Toast.fire({
@@ -566,6 +511,17 @@
                         title: 'Some error occured!'
                     });
                 })
+            },
+
+
+            onQueryIdChanged(event, table){
+              var selected = event.target.value;
+              this.queryId = selected.substring(0, selected.indexOf("_"));
+              this.selectedName = selected.substring(selected.indexOf("_") +1 );
+              this.queryTable = table;
+              this.$Progress.start();
+              this.loadUserClassrooms();
+              this.$Progress.finish();
             },
 
 
@@ -598,12 +554,12 @@
             
             onPageChange(params) {
               this.updateParams({page: params.currentPage});
-              this.loadUsers();
+              this.loadUserClassrooms();
             },
 
             onPerPageChange(params) {
               this.updateParams({perPage: params.currentPerPage});
-              this.loadUsers();
+              this.loadUserClassrooms();
             },
 
             onSortChange(params) {
@@ -616,20 +572,34 @@
                         field: params[0].field,
                     }],
                 });
-                this.loadUsers();
+                this.loadUserClassrooms();
             },
 
 
             onColumnFilter(params) {
               this.updateParams(params);
-              this.loadUsers();
+              this.loadUserClassrooms();
             },
             
 
             onSearch(params) {
               this.updateParams({searchTerm: params.searchTerm});
-              this.loadUsers();
-            },    
+              this.loadUserClassrooms();
+            },  
+            
+            
+            onSelectAll(){
+              this.selectAll = !this.selectAll;
+              if(this.selectAll){
+                  var ids = this.classrooms
+                    .map(function (data) { return data.id; });  
+                  this.checkedClassrooms = ids;
+              } else {
+                this.checkedClassrooms = [];
+              }                      
+              console.log(JSON.stringify(ids));
+              //checkedClassrooms;
+            },
 
 
             toggleColumn( index, event ){
@@ -639,20 +609,30 @@
 
 
             // load items is what brings back the rows from server
-            loadUsers() {
+            loadUserClassrooms() {
+                if(!this.queryId)
+                  return;
+
                 this.$Progress.start();
                 var parameters = "?perPage="+ this.serverParams.perPage;
                 parameters = parameters + "&page="+ this.serverParams.page;
                 parameters = parameters + "&sortField="+ this.serverParams.sort[0].field;
                 parameters = parameters + "&sortType="+ this.serverParams.sort[0].type;
                 parameters = parameters + "&searchTerm="+ this.serverParams.searchTerm;
-                var url = "api/users"+parameters;
+                parameters = parameters + "&tbl=classroom";
+                parameters = parameters + "&pv_tbl="+this.queryTable;
+                parameters = parameters + "&pv_id="+this.queryId;
+                var url = "api/classroom-users"+parameters;
                 //console.log(JSON.stringify( url));
                 try{
-                    this.form.get( url ).then( users  => {
-                        if(users.data.data){
-                          this.totalRecords = users.data.data.total
-                          this.users = users.data.data.data;
+                    this.form.get( url ).then( classrooms  => {
+                        if(classrooms.data.data){
+                          this.totalRecords = classrooms.data.data.total
+                          this.userClassrooms = classrooms.data.data.data;
+                          this.checkedClassrooms 
+                            = this.userClassrooms
+                            .map(function (data) { return data.id; });                        
+
                         }
                     });
                 } catch(error){
@@ -660,6 +640,29 @@
                 };
                 this.$Progress.finish();
             },
+
+
+
+            // load pivot_tables data
+            loadUsers() {
+              var url = "api/users";
+              this.form.get( url ).then( users  => {
+                  if(users.data.data.data){
+                    this.users = users.data.data.data                  
+                  }
+              });
+            },
+
+
+             // load the table data
+             loadClassrooms() {
+              var url = "api/classrooms";
+              this.form.get( url ).then( classrooms  => {
+                  if(classrooms.data.data.data){
+                    this.classrooms = classrooms.data.data.data                  
+                  }
+              });
+            },           
 
 
             ucAllWords(words) {
@@ -673,65 +676,28 @@
 
 
             isSpecialColumn(field){
-              if(field != 'id' && field != 'updated_at' && field != 'created_at' 
+              if(field != 'id' && field != 'updated_at' && field != 'created_at' && field != 'pivot'
                    && field != 'vgt_id' && field != 'vgtSelected' && field != 'originalIndex' ) 
                     return false;
                    else
                     return true;
-            },
-
-      
-                                                                                                                                                                                            loadSections(){
-
-
-                          try{
-                              var url = "api/sections?all=all";
-                              axios.get( url ).then( sections  => {
-                                  if(sections.data.data){
-                                    this.sections = sections.data.data;
-                                  }
-                              });
-                          } catch(error){
-                            console.log(error.message);
-                          };
-
-                    },
-                                                                loadDepartments(){
-
-
-                          try{
-                              var url = "api/departments?all=all";
-                              axios.get( url ).then( departments  => {
-                                  if(departments.data.data){
-                                    this.departments = departments.data.data;
-                                  }
-                              });
-                          } catch(error){
-                            console.log(error.message);
-                          };
-
-                    },
-                                                                                                                                                                        
-
-
+            }
 
         },
 
 
         mounted() {
-            //console.log('User Component mounted.')
+            //console.log('classroom Component mounted.')
             this.$Progress.start();
             this.loadUsers();
-                                                                                                                                                                                            this.loadSections();          
-                                                                this.loadDepartments();          
-                                                                                                                                                                                    this.$Progress.finish();
+            this.$Progress.finish();
 
         },
 
 
         created() {
             this.$Progress.start();
-            this.loadUsers();
+            //this.loadUserClassrooms();
             this.$Progress.finish();
             
         },

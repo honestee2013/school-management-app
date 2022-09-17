@@ -2,23 +2,33 @@
   <section class="content">
     <!-- PDF Generator begins -->
     <html-pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="true"
-      :paginate-elements-by-height="14000" filename="classroom_lists" :pdf-quality="2" :manual-pagination="true"
+      :paginate-elements-by-height="14000" filename="user_lists" :pdf-quality="2" :manual-pagination="true"
       pdf-format="a4" pdf-orientation="landscape" pdf-content-width="100%" ref="html2Pdf">
       <section id="printPaper" slot="pdf-content"
         style=" width:100%; background-color: white;  padding: 0% 0.5% 40% 0.5%;">
         <div style="margin-left: 0; width: 100%; ">
-          <h3 style="text-align:center; text-decoration: underline; padding: 1em; "> Classroom Lists</h3>
+          <h3 style="text-align:center; text-decoration: underline; padding: 1em; "> user Lists</h3>
           <table class="table table-bordered" style="width: 100%; ">
             <thead>
               <tr>
-                <th>Section Id</th>
                 <th>Name</th>
+                <th>Email</th>
+                <th>User Number</th>
+                <th>Parent Number</th>
+                <th>Password</th>
+                <th>Email Verified At</th>
+                <th>Remember Token</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(classroom, index) in classrooms" :key="classroom.id">
-                <td>{{ classroom.section_id }} </td>
-                <td>{{ classroom.name }} </td>
+              <tr v-for="(user, index) in users" :key="user.id">
+                <td>{{ user.name }} </td>
+                <td>{{ user.email }} </td>
+                <td>{{ user.user_number }} </td>
+                <td>{{ user.parent_number }} </td>
+                <td>{{ user.password }} </td>
+                <td>{{ user.email_verified_at }} </td>
+                <td>{{ user.remember_token }} </td>
               </tr>
             </tbody>
           </table>
@@ -36,22 +46,24 @@
           <!-- card header -->
           <div class="card-header pr-sm-3">
             <div class="d-flex mb-3">
-              <h3 class="card-title mr-auto ">Classroom List </h3>
-              <button type="button" class="btn btn-sm btn-primary " @click="newModal">
+              <h3 class="card-title mr-auto ">
+                Classroom users
+              </h3>
+
+              <button type="button" class="btn btn-sm btn-primary " @click="newModal" v-show="queryId">
                 <i class="fa fa-plus-square"></i>
                 Add New
               </button>
             </div>
           </div> <!-- /.card header -->
 
-
           <!-- More options -->
           <nav class="navbar  navbar-light bg-light">
             <span class="navbar-brand">
-              <router-link to="/classroom-users">
+              <router-link to="/classrooms">
                 <a type="button" class="btn btn-primary btn-sm" role="button" aria-pressed="true">
-                  <i class="fas fa-users" />
-                  Classroom Users
+                  <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                  Classrooms
                 </a>
               </router-link>
             </span>
@@ -70,12 +82,24 @@
           </nav>
           <!--/ More options -->
 
-
-
           <!-- card-body table container -->
           <div class="card-body table-responsive p-2">
+            <div class="form-row mb-2">
+              <div v-show="queryId" class="bg-light py-2 col-12 text-bold mb-2 pl-3" style="margin-top:-0.2em">
+                Users for <h5> {{selectedName}} </h5>
+              </div>
+
+              <div class="col">
+                <select class="custom-select" v-model="queryId" @change="onQueryIdChanged($event, 'classroom' )">
+                  <option v-show="(queryId==0)" selected value="0">Select classroom</option>
+                  <option v-if="classrooms" v-for="row in classrooms" :value="row.id+'_'+row.name"
+                    :selected="row.id == queryId">{{ row.name }}</option>
+                </select>
+              </div>
+
+            </div>
             <!-- VUE GOOD TABLE BEGINS -->
-            <vue-good-table mode="remote" @on-page-change="onPageChange" @on-sort-change="onSortChange"
+            <vue-good-table v-show="queryId" mode="remote" @on-page-change="onPageChange" @on-sort-change="onSortChange"
               @on-column-filter="onColumnFilter" @on-per-page-change="onPerPageChange" @on-search="onSearch"
               @on-selected-rows-change="onSelectionChanged" styleClass="vgt-table  bordered table-hover "
               :totalRows="totalRecords" :isLoading.sync="isLoading" :select-options="{
@@ -87,35 +111,32 @@
                       }" :search-options="{
                         enabled: true,
                         placeholder: 'Search the table',
-                      }" :rows="classrooms" :columns="columns">
+                      }" :rows="classroomUsers" :columns="columns">
               <!-- Vue Good TABLE CONTENTS and ACTIONS slot -->
               <div slot="table-actions">
-                <!-- Button Groups for EXPORTING TABLE -->
-                <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
-                  <div class="btn-group" role="group">
-                    <button id="btnGroupDrop1" type="button" class="btn btn-default btn-sm " data-toggle="dropdown"
-                      aria-expanded="false">
-                      <i class="fa fa-download"></i> Export
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                      <button href="#" class="dropdown-item" @click.prevent="print">
-                        <i class="fa fa-print mr-1"></i> Print
-                      </button>
-                      <button href="#" class="dropdown-item">
-                        <!-- JSON_EXCEL Component -->
-                        <json-excel class="" :data="classrooms" :fields="table_heders" worksheet="Classroom Lits"
-                          name="classroom_lists.xls">
-                          <i class="fa fa-file-excel mr-1"></i> Excel
-                        </json-excel>
-                      </button>
-                      <button href="#" class="dropdown-item" @click.prevent="generatePDF">
-                        <i class="fa fa-file-pdf mr-1"></i> PDF
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Button Groups for SHOWING/HIDING Columns -->
+                <!-- Button Groups for EXPORTING TABLE - ->  
+                              <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
+                                <div class="btn-group" role="group">
+                                  <button id="btnGroupDrop1" type="button" class="btn btn-default btn-sm " data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-download"></i> Export
+                                  </button>
+                                  <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <button href="#" class="dropdown-item" @click.prevent="print">
+                                        <i class="fa fa-print mr-1"></i> Print
+                                    </button>  
+                                      <button href="#" class="dropdown-item">
+                                        <!-- JSON_EXCEL Component - ->  
+                                        <json-excel class="" :data="users" :fields="table_heders" worksheet="user List" name="user_lists.xls">
+                                            <i class="fa fa-file-excel mr-1"></i> Excel
+                                        </json-excel>
+                                    </button>
+                                    <button href="#" class="dropdown-item" @click.prevent="generatePDF">
+                                        <i class="fa fa-file-pdf mr-1"></i> PDF
+                                    </button>    
+                                  </div>
+                                </div>
+                              </div>
+                              <!-- Button Groups for SHOWING/HIDING Columns -->
                 <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
                   <div class="btn-group" role="group">
                     <button id="btnGroupDrop1" type="button" class="btn btn-default btn-sm " data-toggle="dropdown"
@@ -134,37 +155,25 @@
               </div><!-- Vue Good Table Action slot and contents ends -->
 
               <div slot="emptystate">
-                No {{$data['singular_lower']}} records found
+                No user records found
               </div>
 
               <!-- Vue Good TABLE ACTION COLUMN options -->
               <template slot="table-row" slot-scope="props">
                 <span v-if="props.column.field == 'action'">
                   <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-primary" @click="classroomDetail(props)">Detail</button>
+                    <button type="button" class="btn btn-sm btn-primary" @click="userDetail(props)">Detail</button>
                     <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
                       data-toggle="dropdown" aria-expanded="false">
                       <span class="sr-only">Toggle Dropdown</span>
                     </button>
 
                     <div class="dropdown-menu">
-                      <!--<a class="dropdown-item" href="#" @click="classroomDetail('show')"><i class="fa fa-eye"> <span style="margin-left:0.1em"> Details </span> </i></a>
+                      <!--<a class="dropdown-item" href="#" @click="userDetail('show')"><i class="fa fa-eye"> <span style="margin-left:0.1em"> Details </span> </i></a>
                                   <div class="dropdown-divider"></div>-->
-                      <!--<router-link :to="'/classroom-users/?queryId='+props.row.id">
-                        <a class="dropdown-item">
-                          <i class="fa fa-users">
-                            <span style="margin-left:0.1em;">
-                              Users
-                            </span>
-                          </i>
-                        </a>
-                      </router-link>
-
-                      <div class="dropdown-divider"></div>-->
-                      <a class="dropdown-item" href="#" @click="editModal(props.row)"><i class="fa fa-edit"> <span
-                            style="margin-left:0.1em"> Edit </span> </i></a>
-                      <a class="dropdown-item " href="#" @click="deleteClassroom(props.row.id)"><i class="fa fa-trash">
-                          <span style="margin-left:0.1em"> Delete </span> </i></a>
+                      <!--<a class="dropdown-item" href="#" @click="editModal(props.row)"><i class="fa fa-edit">  <span style="margin-left:0.1em"> Edit </span>  </i></a>-->
+                      <a class="dropdown-item " href="#" @click="deleteClassroomUsers(props.row.id)"><i
+                          class="fa fa-trash"> <span style="margin-left:0.1em"> Remove </span> </i></a>
                     </div>
                   </div>
                 </span>
@@ -178,19 +187,20 @@
                 <div class="dropdown">
                   <button class="btn btn-sm btn-success dropdown-toggle" type="button" data-toggle="dropdown"
                     aria-expanded="false">
-                    Selected Classrooms
+                    Selected users
                   </button>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item " href="#" @click="deleteSelectedClassrooms()"><i class="fa fa-trash"> <span
-                          style="margin-left:0.1em"> Delete </span> </i></a>
+                    <a class="dropdown-item " href="#" @click="deleteSelectedUsers()"><i class="fa fa-trash"> <span
+                          style="margin-left:0.1em"> Remove </span> </i></a>
                   </div>
                 </div>
               </div>
             </vue-good-table>
+
           </div> <!-- card-body table container ends -->
 
           <div class="card-footer">
-            <!--<pagination :data="classrooms" @pagination-change-page="getResults"></pagination>-->
+            <!--<pagination :data="users" @pagination-change-page="getResults"></pagination>-->
           </div>
         </div> <!-- /.card ends-->
       </div> <!-- /.row ends-->
@@ -207,51 +217,48 @@
         <div class="modal-content">
           <div class="modal-header">
             <!-- Modal Header -->
-            <h5 class="modal-title" v-show="!editmode">New Classroom</h5>
-            <h5 class="modal-title" v-show="editmode">Update Classroom</h5>
+            <h5 class="modal-title" v-show="!editmode">Add users</h5>
+            <h5 class="modal-title" v-show="editmode">Update users</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
 
           <!-- <form @submit.prevent="createModel"> -->
-          <form @submit.prevent="editmode ? updateClassroom() : createClassroom()">
+          <form @submit.prevent="editmode ? updateClassroomUsers() : createClassroomUsers()">
             <div class="modal-body">
-              <div class="form-group">
 
-                <input type="hidden" v-model="form.id"></input>
+              <div class="card border-light w-100">
+                <div class="card-header">
+                  Select users for <h5> {{selectedName}} </h5>
+                </div>
+                <ul class="list-group list-group-flush">
 
+                  <li class="list-group-item bg-light">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" id="select_all"
+                        v-on:change="onSelectAll()">
+                      <label class="form-check-label" for="select_all"> All users </label>
+                    </div>
+                  </li>
+
+
+
+                  <li v-for="row in users" class="list-group-item">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" :value="row.id" :id="row.id"
+                        v-model="checkedUsers">
+                      <label class="form-check-label" :for="row.id"> {{row.name}}</label>
+                    </div>
+                  </li>
+                </ul>
               </div>
-              <div class="form-group">
-                <label>Section</label>
-                <select v-model="form.section_id" name="section_id" class="form-control"
-                  :class="{ 'is-invalid': form.errors.has( 'section_id' ) }">
-                  <option v-for="(item, index)  in sections" :key="index" :value="item.id"> {{item.name}} </option>
-                </select>
-                <has-error :form="form" field="section_id"></has-error>
 
-              </div>
-              <div class="form-group">
-                <label>Name</label>
-                <input type="text" v-model="form.name" name="name" class="form-control"
-                  :class="{ 'is-invalid': form.errors.has( 'name' ) }" maxlength="125">
-                <has-error :form="form" field="name"></has-error>
-              </div>
-              <div class="form-group">
-
-                <input type="hidden" v-model="form.created_at"></input>
-
-              </div>
-              <div class="form-group">
-
-                <input type="hidden" v-model="form.updated_at"></input>
-
-              </div>
             </div><!-- Modal body ends -->
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
               <button v-show="editmode" type="submit" class="btn btn-success">Update</button>
-              <button v-show="!editmode" type="submit" class="btn btn-primary">Create</button>
+              <button v-show="!editmode" type="submit" class="btn btn-primary"> OK </button>
             </div>
           </form> <!-- Form Ends -->
         </div>
@@ -259,13 +266,12 @@
     </div>
 
     <!-- Detail Modal -->
-    <div class="modal fade" id="classroomDetail" tabindex="-1" role="dialog" aria-labelledby="classroomDetail"
-      aria-hidden="true">
+    <div class="modal fade" id="userDetail" tabindex="-1" role="dialog" aria-labelledby="userDetail" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <!-- Modal Header -->
-            <h5 class="modal-title"> Classroom Detail</h5>
+            <h5 class="modal-title"> User Detail</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -279,10 +285,11 @@
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal" @click="deleteClassroom(clickedRow.id)"><i
-                class="fa fa-trash"></i> Delete </button>
-            <button type="button" class="btn btn-primary" data-dismiss="modal" @click="editModal(clickedRow)"><i
-                class="fa fa-edit"></i> Edit</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal"
+              @click="deleteClassroomUsers(clickedRow.id)"><i class="fa fa-trash"></i> Remove </button>
+            <!--<button type="button" class="btn btn-primary" 
+                        data-dismiss="modal" 
+                        @click="editModal(clickedRow)"><i class="fa fa-edit"></i> Edit</button>-->
             <button type="button" class="btn btn-primary" data-dismiss="modal"><i class="fa fa-times"></i>
               Close</button>
 
@@ -304,16 +311,21 @@ export default {
   data() {
     return {
       editmode: false,
+      classroomUsers: [],
+      users: [],
       classrooms: [],
+      checkedUsers: [],
       search: '',
+      selectAll: false,
 
       isLoading: false,
       totalRecords: 0,
       clickedRow: null,
       selectedRows: [],
-
-
-      sections: [],
+      selectedRows: [],
+      queryId: 0,
+      selectedName: "",
+      queryTable: "",
 
       serverParams: {
         columnFilters: {
@@ -321,11 +333,31 @@ export default {
         sort: [
           {
             "type": "asc",
-            "field": "section_id"
+            "field": "name"
           },
           {
             "type": "asc",
-            "field": "name"
+            "field": "email"
+          },
+          {
+            "type": "asc",
+            "field": "user_number"
+          },
+          {
+            "type": "asc",
+            "field": "parent_number"
+          },
+          {
+            "type": "asc",
+            "field": "password"
+          },
+          {
+            "type": "asc",
+            "field": "email_verified_at"
+          },
+          {
+            "type": "asc",
+            "field": "remember_token"
           },
         ],
         page: 1,
@@ -335,15 +367,25 @@ export default {
 
       form: new Form({
         "id": "",
-        "section_id": "",
         "name": "",
+        "email": "",
+        "user_number": "",
+        "parent_number": "",
+        "password": "",
+        "email_verified_at": "",
+        "remember_token": "",
         "created_at": "",
         "updated_at": "",
       }),
 
       table_heders: {
-        "Section Id": "section_id",
         "Name": "name",
+        "Email": "email",
+        "User Number": "user_number",
+        "Parent Number": "parent_number",
+        "Password": "password",
+        "Email Verified At": "email_verified_at",
+        "Remember Token": "remember_token",
       },
 
       columns: [
@@ -353,13 +395,38 @@ export default {
           hidden: true
         },
         {
-          label: "Section Id",
-          field: "section_id",
+          label: "Name",
+          field: "name",
           hidden: false
         },
         {
-          label: "Name",
-          field: "name",
+          label: "Email",
+          field: "email",
+          hidden: false
+        },
+        {
+          label: "User Number",
+          field: "user_number",
+          hidden: false
+        },
+        {
+          label: "Parent Number",
+          field: "parent_number",
+          hidden: false
+        },
+        {
+          label: "Password",
+          field: "password",
+          hidden: false
+        },
+        {
+          label: "Email Verified At",
+          field: "email_verified_at",
+          hidden: false
+        },
+        {
+          label: "Remember Token",
+          field: "remember_token",
           hidden: false
         },
         {
@@ -394,15 +461,15 @@ export default {
 
   methods: {
 
-    classroomDetail(params) {
+    userDetail(params) {
       this.clickedRow = params.row;
-      $('#classroomDetail').modal('show');
+      $('#userDetail').modal('show');
     },
 
-    updateClassroom() {
+    updateClassroomUsers() {
       this.$Progress.start();
       // console.log('Editing data');
-      this.form.put('api/classrooms/' + this.form.id)
+      this.form.put("api/user-classrooms/" + this.form.id)
         .then((response) => {
           // success
           $('#addNew').modal('hide');
@@ -412,7 +479,7 @@ export default {
           });
           this.$Progress.finish();
           //  Fire.$emit('AfterCreate');
-          this.loadClassrooms();
+          this.loadClassroomUsers();
         })
         .catch(() => {
           Toast.fire({
@@ -423,20 +490,22 @@ export default {
         });
     },
 
-    editModal(classroom) {
+    editModal(user) {
+      this.loadUsers();
       this.editmode = true;
       this.form.reset();
       $('#addNew').modal('show');
-      this.form.fill(classroom);
+      this.form.fill(user);
     },
 
     newModal() {
+      this.loadUsers();
       this.editmode = false;
       this.form.reset();
       $('#addNew').modal('show');
     },
 
-    deleteClassroom(id) {
+    deleteClassroomUsers(id) {
       Swal.fire({
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
@@ -447,15 +516,22 @@ export default {
       }).then((result) => {
         // Send request to the server
         if (result.value) {
-          const theData = [id];
-          this.form.delete('api/classrooms/' + JSON.stringify(theData)).then(() => {
+
+          var parameters = new Object();
+          parameters["tbl"] = "user";
+          parameters["pv_tbl"] = this.queryTable;
+          parameters["pv_id"] = this.queryId;
+          parameters["pv_ids"] = id;//this.checkedUsers;
+
+          //const theData = [id];
+          axios.delete('api/user-classrooms/' + JSON.stringify(parameters)).then(() => {
             Swal.fire(
               'Deleted!',
-              'The classroom was deleted successfully.',
+              'The user was deleted successfully.',
               'success'
             );
             // Fire.$emit('AfterCreate');
-            this.loadClassrooms();
+            this.loadClassroomUsers();
           }).catch((data) => {
             Swal.fire("Failed!", data.message, "warning");
           });
@@ -463,10 +539,10 @@ export default {
       })
     },
 
-    deleteSelectedClassrooms() {
+    deleteSelectedUsers() {
       Swal.fire({
         title: 'Are you sure?',
-        text: "Delete " + this.selectedRows.length + " records? You won't be able to revert this!",
+        text: "Remove " + this.selectedRows.length + " records? You won't be able to revert this!",
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
@@ -474,15 +550,24 @@ export default {
       }).then((result) => {
         // Send request to the server
         if (result.value) {
-          let theData = JSON.stringify(this.selectedRows);
-          this.form.delete('api/classrooms/' + theData).then(() => {
+
+          var parameters = new Object();
+          parameters["tbl"] = "user";
+          parameters["pv_tbl"] = this.queryTable;
+          parameters["pv_id"] = this.queryId;
+          parameters["pv_ids"] = this.selectedRows;//this.checkedUsers;
+
+
+
+          let theData = JSON.stringify(parameters);
+          axios.delete("api/user-classrooms/" + theData).then(() => {
             Swal.fire(
               'Deleted!',
-              'The classroom was deleted successfully.',
+              'The user was deleted successfully.',
               'success'
             );
             // Fire.$emit('AfterCreate');
-            this.loadClassrooms();
+            this.loadClassroomUsers();
           }).catch((data) => {
             Swal.fire("Failed!", data.message, "warning");
           });
@@ -491,8 +576,14 @@ export default {
     },
 
 
-    createClassroom() {
-      this.form.post('api/classrooms')
+    createClassroomUsers() {
+      var parameters = "?tbl=user";
+      parameters = parameters + "&pv_tbl=" + this.queryTable;
+      parameters = parameters + "&pv_id=" + this.queryId;
+      parameters = parameters + "&pv_ids=" + this.checkedUsers;
+      var url = "api/user-classrooms" + parameters;
+
+      axios.post(url)
         .then((response) => {
           $('#addNew').modal('hide');
           Toast.fire({
@@ -500,7 +591,7 @@ export default {
             title: response.data.message
           });
           this.$Progress.finish();
-          this.loadClassrooms();
+          this.loadClassroomUsers();
         })
         .catch(() => {
           Toast.fire({
@@ -508,6 +599,17 @@ export default {
             title: 'Some error occured!'
           });
         })
+    },
+
+
+    onQueryIdChanged(event, table) {
+      var selected = event.target.value;
+      this.queryId = selected.substring(0, selected.indexOf("_"));
+      this.selectedName = selected.substring(selected.indexOf("_") + 1);
+      this.queryTable = table;
+      this.$Progress.start();
+      this.loadClassroomUsers();
+      this.$Progress.finish();
     },
 
 
@@ -540,12 +642,12 @@ export default {
 
     onPageChange(params) {
       this.updateParams({ page: params.currentPage });
-      this.loadClassrooms();
+      this.loadClassroomUsers();
     },
 
     onPerPageChange(params) {
       this.updateParams({ perPage: params.currentPerPage });
-      this.loadClassrooms();
+      this.loadClassroomUsers();
     },
 
     onSortChange(params) {
@@ -558,19 +660,33 @@ export default {
           field: params[0].field,
         }],
       });
-      this.loadClassrooms();
+      this.loadClassroomUsers();
     },
 
 
     onColumnFilter(params) {
       this.updateParams(params);
-      this.loadClassrooms();
+      this.loadClassroomUsers();
     },
 
 
     onSearch(params) {
       this.updateParams({ searchTerm: params.searchTerm });
-      this.loadClassrooms();
+      this.loadClassroomUsers();
+    },
+
+
+    onSelectAll() {
+      this.selectAll = !this.selectAll;
+      if (this.selectAll) {
+        var ids = this.users
+          .map(function (data) { return data.id; });
+        this.checkedUsers = ids;
+      } else {
+        this.checkedUsers = [];
+      }
+      console.log(JSON.stringify(ids));
+      //checkedUsers;
     },
 
 
@@ -581,26 +697,59 @@ export default {
 
 
     // load items is what brings back the rows from server
-    loadClassrooms() {
+    loadClassroomUsers() {
+      if (!this.queryId)
+        return;
+
       this.$Progress.start();
       var parameters = "?perPage=" + this.serverParams.perPage;
       parameters = parameters + "&page=" + this.serverParams.page;
       parameters = parameters + "&sortField=" + this.serverParams.sort[0].field;
       parameters = parameters + "&sortType=" + this.serverParams.sort[0].type;
       parameters = parameters + "&searchTerm=" + this.serverParams.searchTerm;
-      var url = "api/classrooms" + parameters;
+      parameters = parameters + "&tbl=user";
+      parameters = parameters + "&pv_tbl=" + this.queryTable;
+      parameters = parameters + "&pv_id=" + this.queryId;
+      var url = "api/user-classrooms" + parameters;
       //console.log(JSON.stringify( url));
       try {
-        this.form.get(url).then(classrooms => {
-          if (classrooms.data.data) {
-            this.totalRecords = classrooms.data.data.total
-            this.classrooms = classrooms.data.data.data;
+        this.form.get(url).then(users => {
+          if (users.data.data) {
+            this.totalRecords = users.data.data.total
+            this.classroomUsers = users.data.data.data;
+            this.checkedUsers
+              = this.classroomUsers
+                .map(function (data) { return data.id; });
+
           }
         });
       } catch (error) {
         console.log(error.message);
       };
       this.$Progress.finish();
+    },
+
+
+
+    // load pivot_tables data
+    loadClassrooms() {
+      var url = "api/classrooms";
+      this.form.get(url).then(classrooms => {
+        if (classrooms.data.data.data) {
+          this.classrooms = classrooms.data.data.data
+        }
+      });
+    },
+
+
+    // load the table data
+    loadUsers() {
+      var url = "api/users";
+      this.form.get(url).then(users => {
+        if (users.data.data.data) {
+          this.users = users.data.data.data
+        }
+      });
     },
 
 
@@ -615,49 +764,34 @@ export default {
 
 
     isSpecialColumn(field) {
-      if (field != 'id' && field != 'updated_at' && field != 'created_at'
+      if (field != 'id' && field != 'updated_at' && field != 'created_at' && field != 'pivot'
         && field != 'vgt_id' && field != 'vgtSelected' && field != 'originalIndex')
         return false;
       else
         return true;
-    },
-
-
-    loadSections() {
-
-
-      try {
-        var url = "api/sections?all=all";
-        axios.get(url).then(sections => {
-          if (sections.data.data) {
-            this.sections = sections.data.data;
-          }
-        });
-      } catch (error) {
-        console.log(error.message);
-      };
-
-    },
-
-
-
+    }
 
   },
 
 
   mounted() {
-    //console.log('Classroom Component mounted.')
+    //console.log('classroom Component mounted.')
+    //const urlParams = new URLSearchParams(window.location.search.substring(1));
+    //this.queryId = urlParams.get('queryId');
+    //console.log('xxxxxxxxxxx '+ urlParams.get('queryId') );
+    //this.queryId = this.$route.params.queryId;
+
+    //console.log('user Component mounted.')
     this.$Progress.start();
     this.loadClassrooms();
-    this.loadSections();
     this.$Progress.finish();
-
   },
+  
 
 
   created() {
     this.$Progress.start();
-    this.loadClassrooms();
+    //this.loadClassroomUsers();
     this.$Progress.finish();
 
   },

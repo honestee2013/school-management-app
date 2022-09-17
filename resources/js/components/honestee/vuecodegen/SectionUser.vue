@@ -1,4 +1,4 @@
-<template>
+<template> 
   <section class="content">
         <!-- PDF Generator begins -->
         <html-pdf
@@ -7,7 +7,7 @@
             :enable-download="true"
             :preview-modal="true"
             :paginate-elements-by-height="14000"
-            filename="department_lists"
+            filename="section_lists"
             :pdf-quality="2"
             :manual-pagination="true"
             pdf-format="a4"
@@ -17,18 +17,18 @@
           >
               <section  id = "printPaper" slot="pdf-content" style=" width:100%; background-color: white;  padding: 0% 0.5% 40% 0.5%;">
                 <div style = "margin-left: 0; width: 100%; ">
-                  <h3 style="text-align:center; text-decoration: underline; padding: 1em; "> Department Lists</h3>
+                  <h3 style="text-align:center; text-decoration: underline; padding: 1em; "> section Lists</h3>
                   <table class="table table-bordered" style="width: 100%; ">
                         <thead>
                             <tr>
-                                                                                                                                                              <th>Section Id</th>
+                                                                                                                                                              <th>School Id</th>
                                                                                                                                 <th>Name</th>
                                                                                                                                                                                                                       </tr>   
                         </thead>
                         <tbody >
-                            <tr v-for="(department, index) in departments" :key="department.id">
-                                                                                                                                                                              <td>{{ department.section_id }} </td>
-                                                                                                                                              <td>{{ department.name }} </td>
+                            <tr v-for="(section, index) in sections" :key="section.id">
+                                                                                                                                                                              <td>{{ section.school_id }} </td>
+                                                                                                                                              <td>{{ section.name }} </td>
                                                                                                                                                                                                                                         </tr>
                         </tbody>
                   </table>
@@ -46,8 +46,11 @@
                 <!-- card header -->
                 <div class="card-header pr-sm-3">
                   <div class="d-flex mb-3">
-                    <h3 class="card-title mr-auto ">Department List </h3>
-                    <button type="button" class="btn btn-sm btn-primary " @click="newModal">
+                    <h3 class="card-title mr-auto ">
+                      User sections 
+                    </h3>
+                    
+                    <button type="button" class="btn btn-sm btn-primary " @click="newModal" v-show="queryId">
                         <i class="fa fa-plus-square"></i>
                         Add New
                     </button>
@@ -56,8 +59,26 @@
 
                 <!-- card-body table container -->
                 <div class="card-body table-responsive p-2"> 
-                    <!-- VUE GOOD TABLE BEGINS -->  
+                    <div class="form-row mb-2">
+                        <div v-show="queryId" class="bg-light py-2 col-12 text-bold mb-2 pl-3" style="margin-top:-0.2em">
+                            Sections for <h5> {{selectedName}} </h5>
+                        </div>
+
+                        <div class="col">
+                            <select class="custom-select" v-model="queryId" @change="onQueryIdChanged($event, 'user' )">
+                              <option v-show = "(queryId==0)" selected value="0">Select user</option>
+                              <option v-if= "users" 
+                                      v-for = "row in users"  
+                                      :value="row.id+'_'+row.name"
+                                      :selected= "row.id == queryId"
+                                      >{{ row.name }}</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <!-- VUE GOOD TABLE BEGINS --> 
                     <vue-good-table
+                      v-show="queryId"
                       mode="remote"
                       @on-page-change="onPageChange"
                       @on-sort-change="onSortChange"
@@ -81,11 +102,11 @@
                         enabled: true,
                         placeholder: 'Search the table',
                       }"
-                      :rows="departments"
+                      :rows="userSections"
                       :columns="columns">
                           <!-- Vue Good TABLE CONTENTS and ACTIONS slot -->  
                           <div slot="table-actions">
-                              <!-- Button Groups for EXPORTING TABLE -->  
+                              <!-- Button Groups for EXPORTING TABLE - ->  
                               <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
                                 <div class="btn-group" role="group">
                                   <button id="btnGroupDrop1" type="button" class="btn btn-default btn-sm " data-toggle="dropdown" aria-expanded="false">
@@ -96,8 +117,8 @@
                                         <i class="fa fa-print mr-1"></i> Print
                                     </button>  
                                       <button href="#" class="dropdown-item">
-                                        <!-- JSON_EXCEL Component -->  
-                                        <json-excel class="" :data="departments" :fields="table_heders" worksheet="Department Lits" name="department_lists.xls">
+                                        <!-- JSON_EXCEL Component - ->  
+                                        <json-excel class="" :data="sections" :fields="table_heders" worksheet="section List" name="section_lists.xls">
                                             <i class="fa fa-file-excel mr-1"></i> Excel
                                         </json-excel>
                                     </button>
@@ -107,7 +128,6 @@
                                   </div>
                                 </div>
                               </div>
-
                               <!-- Button Groups for SHOWING/HIDING Columns -->  
                               <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
                                 <div class="btn-group" role="group">
@@ -124,23 +144,23 @@
                           </div><!-- Vue Good Table Action slot and contents ends --> 
                           
                           <div slot="emptystate">
-                            No {{$data['singular_lower']}} records found
+                            No section records found
                           </div>
 
                           <!-- Vue Good TABLE ACTION COLUMN options -->  
                           <template slot="table-row" slot-scope="props">
                             <span v-if="props.column.field == 'action'">
                               <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-primary"  @click="departmentDetail(props)">Detail</button>
+                                <button type="button" class="btn btn-sm btn-primary"  @click="sectionDetail(props)">Detail</button>
                                 <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
                                   <span class="sr-only">Toggle Dropdown</span>
                                 </button>
 
                                 <div class="dropdown-menu">
-                                  <!--<a class="dropdown-item" href="#" @click="departmentDetail('show')"><i class="fa fa-eye"> <span style="margin-left:0.1em"> Details </span> </i></a>
+                                  <!--<a class="dropdown-item" href="#" @click="sectionDetail('show')"><i class="fa fa-eye"> <span style="margin-left:0.1em"> Details </span> </i></a>
                                   <div class="dropdown-divider"></div>-->
-                                  <a class="dropdown-item" href="#" @click="editModal(props.row)"><i class="fa fa-edit">  <span style="margin-left:0.1em"> Edit </span>  </i></a>
-                                  <a class="dropdown-item " href="#" @click="deleteDepartment(props.row.id)"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Delete </span>  </i></a>
+                                  <!--<a class="dropdown-item" href="#" @click="editModal(props.row)"><i class="fa fa-edit">  <span style="margin-left:0.1em"> Edit </span>  </i></a>-->
+                                  <a class="dropdown-item " href="#" @click="deleteUserSections(props.row.id)"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Remove </span>  </i></a>
                                 </div>
                               </div>
                             </span>
@@ -153,18 +173,19 @@
                           <div slot="selected-row-actions">
                               <div class="dropdown">
                                   <button class="btn btn-sm btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-                                    Selected Departments
+                                    Selected sections
                                   </button>
                                   <div class="dropdown-menu">
-                                    <a class="dropdown-item " href="#" @click="deleteSelectedDepartments()"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Delete </span>  </i></a>
+                                    <a class="dropdown-item " href="#" @click="deleteSelectedSections()"><i class="fa fa-trash">  <span style="margin-left:0.1em"> Remove </span>  </i></a>
                                   </div>
                                 </div>
                           </div>
                     </vue-good-table>
+
                 </div> <!-- card-body table container ends -->
 
                 <div class="card-footer">
-                    <!--<pagination :data="departments" @pagination-change-page="getResults"></pagination>-->
+                    <!--<pagination :data="sections" @pagination-change-page="getResults"></pagination>-->
                 </div>
               </div> <!-- /.card ends-->
           </div> <!-- /.row ends-->
@@ -180,62 +201,46 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header"> <!-- Modal Header -->
-                      <h5 class="modal-title" v-show="!editmode">New Department</h5>
-                      <h5 class="modal-title" v-show="editmode">Update Department</h5>
+                      <h5 class="modal-title" v-show="!editmode">Add sections</h5>
+                      <h5 class="modal-title" v-show="editmode">Update sections</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                       </button>
                   </div>
 
                   <!-- <form @submit.prevent="createModel"> -->
-                  <form @submit.prevent="editmode ? updateDepartment() : createDepartment()">
+                  <form @submit.prevent="editmode ? updateUserSections() : createUserSections()">
                     <div class="modal-body">
-                                                    <div class="form-group">
-                                 
-                                  <input type="hidden" v-model="form.id"></input>
-                              
-                                                          </div>
-                                                      <div class="form-group">
-                                                                <label>Section</label>
-                                  <select v-model="form.section_id" name="section_id" class="form-control" 
-                                          :class="{ 'is-invalid': form.errors.has( 'section_id' ) }">
-                                      <option v-for="(item, index)  in sections"
-                                            :key= "index" :value="item.id"> {{item.name}} </option>
-                                  </select>
-                                  
-                                                          </div>
-                                                      <div class="form-group">
-                                                                <label>Name</label>
-                                  <select v-model="form.name" name="name" class="form-control" :class="{ 'is-invalid': form.errors.has( 'name' ) }">
-                                                                                <option> Science </option>
-                                                                                <option> Art </option>
-                                                                                <option> Commerce </option>
-                                                                                <option> Mathematics </option>
-                                                                                <option> Languages </option>
-                                                                                <option> Humanities </option>
-                                                                                <option> Business Studies </option>
-                                                                                <option> Home Economics </option>
-                                                                                <option> Technical </option>
-                                                                                <option> Guidance &amp; Counselling </option>
-                                                                        </select>
-                                                                        <has-error :form="form" field="name"></has-error>
-                                                                                          
-                                                          </div>
-                                                      <div class="form-group">
-                                 
-                                  <input type="hidden" v-model="form.created_at"></input>
-                              
-                                                          </div>
-                                                      <div class="form-group">
-                                 
-                                  <input type="hidden" v-model="form.updated_at"></input>
-                              
-                                                          </div>
-                                              </div><!-- Modal body ends -->
+
+                        <div class="card border-light w-100" >
+                          <div class="card-header">
+                            Select sections for <h5> {{selectedName}} </h5>
+                          </div>
+                          <ul class="list-group list-group-flush">
+
+                            <li class="list-group-item bg-light">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="select_all" v-on:change="onSelectAll()">
+                                <label class="form-check-label" for="select_all" > All sections </label>
+                              </div>
+                            </li> 
+                          
+                          
+                          
+                            <li v-for="row in sections" class="list-group-item">
+                              <div class="form-check">
+                                <input class="form-check-input" type="checkbox" :value="row.id" :id="row.id" v-model="checkedSections">
+                                <label class="form-check-label" :for="row.id"> {{row.name}}</label>
+                              </div>
+                            </li>  
+                          </ul>
+                        </div>
+
+                    </div><!-- Modal body ends -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button v-show="editmode" type="submit" class="btn btn-success">Update</button>
-                        <button v-show="!editmode" type="submit" class="btn btn-primary">Create</button>
+                        <button v-show="!editmode" type="submit" class="btn btn-primary"> OK </button>
                     </div>
                   </form> <!-- Form Ends -->
                 </div>
@@ -243,11 +248,11 @@
         </div>
 
         <!-- Detail Modal -->
-        <div class="modal fade" id="departmentDetail" tabindex="-1" role="dialog" aria-labelledby="departmentDetail" aria-hidden="true">
+        <div class="modal fade" id="sectionDetail" tabindex="-1" role="dialog" aria-labelledby="sectionDetail" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header"> <!-- Modal Header -->
-                        <h5 class="modal-title" > Department Detail</h5>
+                        <h5 class="modal-title" > Section Detail</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -262,10 +267,10 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" 
                         data-dismiss="modal" 
-                        @click="deleteDepartment(clickedRow.id)"><i class="fa fa-trash"></i> Delete </button>
-                        <button type="button" class="btn btn-primary" 
+                        @click="deleteUserSections(clickedRow.id)"><i class="fa fa-trash"></i> Remove </button>
+                        <!--<button type="button" class="btn btn-primary" 
                         data-dismiss="modal" 
-                        @click="editModal(clickedRow)"><i class="fa fa-edit"></i> Edit</button>
+                        @click="editModal(clickedRow)"><i class="fa fa-edit"></i> Edit</button>-->
                         <button type="button" class="btn btn-primary" 
                         data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
                                                           
@@ -287,23 +292,28 @@
         data () {
             return {
                 editmode: false,
-                departments : [],
+                userSections : [],
+                sections : [],
+                users : [],
+                checkedSections : [],
                 search : '',
+                selectAll: false,
 
                 isLoading: false,
                 totalRecords: 0,
                 clickedRow: null,
                 selectedRows: [],
+                selectedRows: [],
+                queryId: 0,
+                selectedName: "",
+                queryTable: "",
 
-
-                                                                                                sections: [],          
-                                                                                                                                                
                 serverParams: {
                   columnFilters: {
                   },
                   sort: [
                                                                                                                       {"type" : "asc",
-                          "field" : "section_id"},
+                          "field" : "school_id"},
                                                                                                 {"type" : "asc",
                           "field" : "name"},
                                                                                                                                                             ],
@@ -314,14 +324,14 @@
                      
                 form: new Form({
                                         "id" : "",
-                                        "section_id" : "",
+                                        "school_id" : "",
                                         "name" : "",
                                         "created_at" : "",
                                         "updated_at" : "",
                                   }),
                 
                 table_heders: {
-                                                                                                  "Section Id" : "section_id",
+                                                                                                  "School Id" : "school_id",
                                                                                 "Name" : "name",
                                                                                                                                   },
 
@@ -329,8 +339,8 @@
                                         { label : "Id",
                       field : "id",
                                               hidden : true},
-                                                              { label : "Section Id",
-                      field : "section_id",
+                                                              { label : "School Id",
+                      field : "school_id",
                                               hidden : false},
                                                               { label : "Name",
                       field : "name",
@@ -363,15 +373,15 @@
                                
         methods: {
 
-            departmentDetail(params){
+            sectionDetail(params){
               this.clickedRow = params.row;
-              $('#departmentDetail').modal('show');
+              $('#sectionDetail').modal('show');
             },
 
-            updateDepartment(){
+            updateUserSections(){
                 this.$Progress.start();
                 // console.log('Editing data');
-                this.form.put('api/departments/'+this.form.id)
+                this.form.put("api/section-users/"+this.form.id)
                 .then((response) => {
                     // success
                     $('#addNew').modal('hide');
@@ -381,7 +391,7 @@
                     });
                     this.$Progress.finish();
                         //  Fire.$emit('AfterCreate');
-                    this.loadDepartments();
+                    this.loadUserSections();
                 })
                 .catch(() => {
                     Toast.fire({
@@ -392,20 +402,22 @@
                 });
             },
 
-            editModal(department){
+            editModal(section){
+                this.loadSections();
                 this.editmode = true;
                 this.form.reset();
                 $('#addNew').modal('show');
-                this.form.fill(department);
+                this.form.fill(section);
             },
 
             newModal(){
+                this.loadSections();
                 this.editmode = false;
                 this.form.reset();
                 $('#addNew').modal('show');
             },
 
-            deleteDepartment(id){
+            deleteUserSections(id){
                 Swal.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -416,15 +428,22 @@
                     }).then((result) => {
                         // Send request to the server
                          if (result.value) {
-                                const theData = [id];
-                                this.form.delete('api/departments/'+JSON.stringify(theData) ).then(()=>{
+   
+                              var parameters = new Object();
+                              parameters["tbl"] = "section";
+                              parameters["pv_tbl"] = this.queryTable;
+                              parameters["pv_id"] = this.queryId;
+                              parameters["pv_ids"] = id;//this.checkedSections;
+                         
+                                //const theData = [id];
+                                axios.delete('api/section-users/'+JSON.stringify(parameters) ).then(()=>{
                                         Swal.fire(
                                         'Deleted!',
-                                        'The department was deleted successfully.',
+                                        'The section was deleted successfully.',
                                         'success'
                                         );
                                     // Fire.$emit('AfterCreate');
-                                    this.loadDepartments();
+                                    this.loadUserSections();
                                 }).catch((data)=> {
                                   Swal.fire("Failed!", data.message, "warning");
                               });
@@ -432,10 +451,10 @@
                     })
             },
 
-            deleteSelectedDepartments(){
+            deleteSelectedSections(){
                 Swal.fire({
                     title: 'Are you sure?',
-                    text: "Delete "+this.selectedRows.length+" records? You won't be able to revert this!",
+                    text: "Remove "+this.selectedRows.length+" records? You won't be able to revert this!",
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
@@ -443,15 +462,24 @@
                     }).then((result) => {
                         // Send request to the server
                          if (result.value) {
-                                let theData = JSON.stringify(this.selectedRows);
-                                this.form.delete('api/departments/'+theData).then(()=>{
+
+                              var parameters = new Object();
+                              parameters["tbl"] = "section";
+                              parameters["pv_tbl"] = this.queryTable;
+                              parameters["pv_id"] = this.queryId;
+                              parameters["pv_ids"] = this.selectedRows;//this.checkedSections;
+                         
+
+
+                                let theData = JSON.stringify( parameters );
+                                axios.delete("api/section-users/"+theData).then(()=>{
                                         Swal.fire(
                                         'Deleted!',
-                                        'The department was deleted successfully.',
+                                        'The section was deleted successfully.',
                                         'success'
                                         );
                                     // Fire.$emit('AfterCreate');
-                                    this.loadDepartments();
+                                    this.loadUserSections();
                                 }).catch((data)=> {
                                   Swal.fire("Failed!", data.message, "warning");
                               });
@@ -460,8 +488,14 @@
             },
             
 
-            createDepartment(){
-                this.form.post('api/departments')
+            createUserSections(){
+                var parameters = "?tbl=section";
+                parameters = parameters + "&pv_tbl="+this.queryTable;
+                parameters = parameters + "&pv_id="+this.queryId;
+                parameters = parameters + "&pv_ids="+this.checkedSections;
+                var url = "api/section-users"+parameters;
+                
+                axios.post(url)
                 .then((response)=>{
                     $('#addNew').modal('hide');
                     Toast.fire({
@@ -469,7 +503,7 @@
                           title: response.data.message
                     });
                     this.$Progress.finish();
-                    this.loadDepartments();
+                    this.loadUserSections();
                 })
                 .catch(()=>{
                     Toast.fire({
@@ -477,6 +511,17 @@
                         title: 'Some error occured!'
                     });
                 })
+            },
+
+
+            onQueryIdChanged(event, table){
+              var selected = event.target.value;
+              this.queryId = selected.substring(0, selected.indexOf("_"));
+              this.selectedName = selected.substring(selected.indexOf("_") +1 );
+              this.queryTable = table;
+              this.$Progress.start();
+              this.loadUserSections();
+              this.$Progress.finish();
             },
 
 
@@ -509,12 +554,12 @@
             
             onPageChange(params) {
               this.updateParams({page: params.currentPage});
-              this.loadDepartments();
+              this.loadUserSections();
             },
 
             onPerPageChange(params) {
               this.updateParams({perPage: params.currentPerPage});
-              this.loadDepartments();
+              this.loadUserSections();
             },
 
             onSortChange(params) {
@@ -527,20 +572,34 @@
                         field: params[0].field,
                     }],
                 });
-                this.loadDepartments();
+                this.loadUserSections();
             },
 
 
             onColumnFilter(params) {
               this.updateParams(params);
-              this.loadDepartments();
+              this.loadUserSections();
             },
             
 
             onSearch(params) {
               this.updateParams({searchTerm: params.searchTerm});
-              this.loadDepartments();
-            },    
+              this.loadUserSections();
+            },  
+            
+            
+            onSelectAll(){
+              this.selectAll = !this.selectAll;
+              if(this.selectAll){
+                  var ids = this.sections
+                    .map(function (data) { return data.id; });  
+                  this.checkedSections = ids;
+              } else {
+                this.checkedSections = [];
+              }                      
+              console.log(JSON.stringify(ids));
+              //checkedSections;
+            },
 
 
             toggleColumn( index, event ){
@@ -550,20 +609,30 @@
 
 
             // load items is what brings back the rows from server
-            loadDepartments() {
+            loadUserSections() {
+                if(!this.queryId)
+                  return;
+
                 this.$Progress.start();
                 var parameters = "?perPage="+ this.serverParams.perPage;
                 parameters = parameters + "&page="+ this.serverParams.page;
                 parameters = parameters + "&sortField="+ this.serverParams.sort[0].field;
                 parameters = parameters + "&sortType="+ this.serverParams.sort[0].type;
                 parameters = parameters + "&searchTerm="+ this.serverParams.searchTerm;
-                var url = "api/departments"+parameters;
+                parameters = parameters + "&tbl=section";
+                parameters = parameters + "&pv_tbl="+this.queryTable;
+                parameters = parameters + "&pv_id="+this.queryId;
+                var url = "api/section-users"+parameters;
                 //console.log(JSON.stringify( url));
                 try{
-                    this.form.get( url ).then( departments  => {
-                        if(departments.data.data){
-                          this.totalRecords = departments.data.data.total
-                          this.departments = departments.data.data.data;
+                    this.form.get( url ).then( sections  => {
+                        if(sections.data.data){
+                          this.totalRecords = sections.data.data.total
+                          this.userSections = sections.data.data.data;
+                          this.checkedSections 
+                            = this.userSections
+                            .map(function (data) { return data.id; });                        
+
                         }
                     });
                 } catch(error){
@@ -571,6 +640,29 @@
                 };
                 this.$Progress.finish();
             },
+
+
+
+            // load pivot_tables data
+            loadUsers() {
+              var url = "api/users";
+              this.form.get( url ).then( users  => {
+                  if(users.data.data.data){
+                    this.users = users.data.data.data                  
+                  }
+              });
+            },
+
+
+             // load the table data
+             loadSections() {
+              var url = "api/sections";
+              this.form.get( url ).then( sections  => {
+                  if(sections.data.data.data){
+                    this.sections = sections.data.data.data                  
+                  }
+              });
+            },           
 
 
             ucAllWords(words) {
@@ -584,49 +676,28 @@
 
 
             isSpecialColumn(field){
-              if(field != 'id' && field != 'updated_at' && field != 'created_at' 
+              if(field != 'id' && field != 'updated_at' && field != 'created_at' && field != 'pivot'
                    && field != 'vgt_id' && field != 'vgtSelected' && field != 'originalIndex' ) 
                     return false;
                    else
                     return true;
-            },
-
-      
-                                                                            loadSections(){
-
-
-                          try{
-                              var url = "api/sections?all=all";
-                              axios.get( url ).then( sections  => {
-                                  if(sections.data.data){
-                                    this.sections = sections.data.data;
-                                  }
-                              });
-                          } catch(error){
-                            console.log(error.message);
-                          };
-
-                    },
-                                                                                                                
-
-
+            }
 
         },
 
 
         mounted() {
-            //console.log('Department Component mounted.')
+            //console.log('section Component mounted.')
             this.$Progress.start();
-            this.loadDepartments();
-                                                                            this.loadSections();          
-                                                                                                                            this.$Progress.finish();
+            this.loadUsers();
+            this.$Progress.finish();
 
         },
 
 
         created() {
             this.$Progress.start();
-            this.loadDepartments();
+            //this.loadUserSections();
             this.$Progress.finish();
             
         },

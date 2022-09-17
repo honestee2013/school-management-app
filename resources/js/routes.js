@@ -38,6 +38,9 @@ export default [
 	
 	{ path: '/under-construction', component: require('./components/honestee/vuecodegen/UnderConstruction.vue').default },
 
+	
+	{ path: '/classroom-users', component: require('./components/honestee/vuecodegen/UserClassroom.vue').default },
+	{ path: '/user-classrooms', component: require('./components/honestee/vuecodegen/ClassroomUser.vue').default },
 	{ path: '*', component: require('./components/NotFound.vue').default },
 ];
 
