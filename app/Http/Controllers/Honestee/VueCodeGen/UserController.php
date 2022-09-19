@@ -44,12 +44,8 @@ class UserController extends Controller
             $result = User::all();
             return $this->sendResponse($result, 'Users list ');
 
-        }else if(Str::plural($request->query('id', ''))){
+        }else if($request['id']){
             $result = User::findOrFail($request['id']);
-            return $this->sendResponse($result, 'Users ');
-
-        }else if(Str::plural($request->query('userNumber', ''))){
-            $result = User::where("user_number", $request['userNumber']);
             return $this->sendResponse($result, 'Users ');
         }
 

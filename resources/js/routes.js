@@ -37,7 +37,6 @@ export default [
 	{ path: '/app-permissions', component: require('./components/honestee/vuecodegen/AppPermission.vue').default },
 	
 	{ path: '/under-construction', component: require('./components/honestee/vuecodegen/UnderConstruction.vue').default },
-	{ path: '/student-result', component: require('./components/honestee/vuecodegen/StudentResult.vue').default },
 
 	
 	{ path: '/classroom-users', component: require('./components/honestee/vuecodegen/UserClassroom.vue').default },
