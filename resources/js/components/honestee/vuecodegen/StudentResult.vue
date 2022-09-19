@@ -70,142 +70,57 @@
           <!-- card header -->
           <div class="card-header pr-sm-3">
             <div class="d-flex mb-3">
-              <h3 class="card-title mr-auto ">Assessment List </h3>
-              <button type="button" class="btn btn-sm btn-primary " @click="newModal">
+              <h3 class="card-title mr-auto "> Student Result Checking </h3>
+              <!----<button type="button" class="btn btn-sm btn-primary " @click="newModal">
                 <i class="fa fa-plus-square"></i>
                 Add New
-              </button>
+              </button>-->
             </div>
           </div> <!-- /.card header -->
 
           <!-- card-body table container -->
-          <div class="card-body table-responsive p-2">
-            <!-- VUE GOOD TABLE BEGINS -->
-            <vue-good-table mode="remote" @on-page-change="onPageChange" @on-sort-change="onSortChange"
-              @on-column-filter="onColumnFilter" @on-per-page-change="onPerPageChange" @on-search="onSearch"
-              @on-selected-rows-change="onSelectionChanged" styleClass="vgt-table  bordered table-hover "
-              :totalRows="totalRecords" :isLoading.sync="isLoading" :select-options="{
-                enabled: true,
-              }" :pagination-options="{
-                        enabled: true,
-                        perPageDropdown: [5, 10, 20, 50, 75, 100],
-                        dropdownAllowAll: false,
-                      }" :search-options="{
-                        enabled: true,
-                        placeholder: 'Search the table',
-                      }" :rows="assessments" :columns="columns">
-              <!-- Vue Good TABLE CONTENTS and ACTIONS slot -->
-              <div slot="table-actions">
-                <!-- Button Groups for EXPORTING TABLE -->
-                <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
-                  <div class="btn-group" role="group">
-                    <button id="btnGroupDrop1" type="button" class="btn btn-default btn-sm " data-toggle="dropdown"
-                      aria-expanded="false">
-                      <i class="fa fa-download"></i> Export
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                      <button href="#" class="dropdown-item" @click.prevent="print">
-                        <i class="fa fa-print mr-1"></i> Print
-                      </button>
-                      <button href="#" class="dropdown-item">
-                        <!-- JSON_EXCEL Component -->
-                        <json-excel class="" :data="assessments" :fields="table_heders" worksheet="Assessment Lits"
-                          name="assessment_lists.xls">
-                          <i class="fa fa-file-excel mr-1"></i> Excel
-                        </json-excel>
-                      </button>
-                      <button href="#" class="dropdown-item" @click.prevent="generatePDF">
-                        <i class="fa fa-file-pdf mr-1"></i> PDF
-                      </button>
-                    </div>
-                  </div>
-                </div>
+          <div class="card-body table-responsive p-1">
 
-                <!-- Button Groups for SHOWING/HIDING Columns -->
-                <div class="mr-auto btn-group my-1" role="group" aria-label="Button group with nested dropdown">
-                  <div class="btn-group" role="group">
-                    <button id="btnGroupDrop1" type="button" class="btn btn-default btn-sm " data-toggle="dropdown"
-                      aria-expanded="false">
-                      <i class="fa fa-eye"></i> Show
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                      <li v-for="(column, index) in columns" :key="index">
-                        <a href="#" class="dropdown-item" tabIndex="-1"
-                          @click.prevent="toggleColumn( index, $event )"><input :checked="!column.hidden"
-                            type="checkbox" />&nbsp;&nbsp;{{column.label}}</a>
-                      </li>
-                    </div>
-                  </div>
-                </div>
-              </div><!-- Vue Good Table Action slot and contents ends -->
 
-              <div slot="emptystate">
-                No {{$data['singular_lower']}} records found
-              </div>
 
-              <!-- Vue Good TABLE ACTION COLUMN options -->
-              <template slot="table-row" slot-scope="props">
-                <span v-if="props.column.field == 'action'">
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-primary"
-                      @click="assessmentDetail(props)">Detail</button>
-                    <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split"
-                      data-toggle="dropdown" aria-expanded="false">
-                      <span class="sr-only">Toggle Dropdown</span>
-                    </button>
+<nav class="navbar navbar-light bg-light">
+      <form class="form-inline">
+        <input type="text" class="form-control"  placeholder="User Number">
+        
+        <select class="custom-select m-sm-2 my-2  " >
+            <option selected>Select Session</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+        </select>
 
-                    <div class="dropdown-menu">
-                      <!--<a class="dropdown-item" href="#" @click="assessmentDetail('show')"><i class="fa fa-eye"> <span style="margin-left:0.1em"> Details </span> </i></a>
-                                  <div class="dropdown-divider"></div>-->
-                      <a class="dropdown-item" href="#" @click="editModal(props.row)"><i class="fa fa-edit"> <span
-                            style="margin-left:0.1em"> Edit </span> </i></a>
-                      <a class="dropdown-item " href="#" @click="deleteAssessment(props.row.id)"><i class="fa fa-trash">
-                          <span style="margin-left:0.1em"> Delete </span> </i></a>
-                    </div>
-                  </div>
-                </span>
-                <span v-else-if="props.column.field == 'section_id'">
-                  {{ (sections.find(a => a.id === props.formattedRow[props.column.field]))? 
-                    (sections.find(a => a.id === props.formattedRow[props.column.field]).name) : "" 
-                  }}
-                </span>
-                <span v-else-if="props.column.field == 'classroom_id'">
-                  {{ (classrooms.find(a => a.id === props.formattedRow[props.column.field]))? 
-                    (classrooms.find(a => a.id === props.formattedRow[props.column.field]).name) : "" 
-                  }}
-                </span>
-                <span v-else-if="props.column.field == 'subject_id'">
-                  {{ (subjects.find(a => a.id === props.formattedRow[props.column.field]))? 
-                    (subjects.find(a => a.id === props.formattedRow[props.column.field]).name) : "" 
-                  }}
-                </span>
-                <span v-else-if="props.column.field == 'user_id'">
-                  {{ (users.find(a => a.id === props.formattedRow[props.column.field]))? 
-                    (
-                      users.find(a => a.id === props.formattedRow[props.column.field]).name + " (" +
-                      users.find(a => a.id === props.formattedRow[props.column.field]).user_number + ")"                    
-                    ) : "" 
-                  }}
-                </span>                                
-                <span v-else>
-                  {{props.formattedRow[props.column.field]}}
-                </span>
-              </template> <!-- Vue Good TABLE ACTION Column ends -->
+        <select class="custom-select mr-sm-2" >
+            <option selected>Select Term</option>
+            <option value="1">First</option>
+            <option value="2">Second</option>
+            <option value="3">Third</option>
+        </select>
 
-              <!-- Vue Good TABLE SELECTED ROW Actions -->
-              <div slot="selected-row-actions">
-                <div class="dropdown">
-                  <button class="btn btn-sm btn-success dropdown-toggle" type="button" data-toggle="dropdown"
-                    aria-expanded="false">
-                    Selected Assessments
-                  </button>
-                  <div class="dropdown-menu">
-                    <a class="dropdown-item " href="#" @click="deleteSelectedAssessments()"><i class="fa fa-trash">
-                        <span style="margin-left:0.1em"> Delete </span> </i></a>
-                  </div>
-                </div>
-              </div>
-            </vue-good-table>
+        <button type="submit" class="btn btn-primary my-2">Check</button>
+    </form>
+</nav>
+
+
+
+
+
+
+
+
+
+
+
           </div> <!-- card-body table container ends -->
 
           <div class="card-footer">
