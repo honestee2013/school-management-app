@@ -87,3 +87,4 @@ class User extends Authenticatable // implements MustVerifyEmail
         return $this->roles()->where('name', 'User')->exists();
     }*/
 }
+
