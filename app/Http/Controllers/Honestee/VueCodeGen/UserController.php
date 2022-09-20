@@ -40,13 +40,27 @@ class UserController extends Controller
         }
         $this->authorize('isAdmin');
 
-        if($request['id'] == "all"){
+
+        if($request['q'] && $request['id']){
+            $user = User::findOrFail($request['id']);
+            $classrooms = null;
+            if($user)
+                $classes = $user->classrooms()->get();
+
+            //$result = User::all();
+            return $this->sendResponse($classes, 'Classrooms list ');
+
+        }else if($request['id'] == "all"){
             $result = User::all();
             return $this->sendResponse($result, 'Users list ');
 
         }else if($request['id']){
             $result = User::findOrFail($request['id']);
             return $this->sendResponse($result, 'Users ');
+
+        }else if($request['userNumber']){
+            $result = User::where("user_number", $request['userNumber'])->first();
+            return $this->sendResponse($result, 'User ');
         }
 
 
@@ -79,6 +93,14 @@ class UserController extends Controller
   
         return $this->sendResponse($users, 'Users list ');
     }
+
+
+
+    public function classrooms($id){
+
+        //return $this->sendResponse(User::findOrFail($id)->classrooms(), 'User classrooms ');
+    }
+
 
 
     public function search($request, $query)

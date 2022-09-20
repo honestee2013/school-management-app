@@ -40,7 +40,18 @@ class ClassroomController extends Controller
         }
         $this->authorize('isAdmin');
 
-        if(Str::plural($request->query('all', ''))){
+
+
+        if($request['q'] && $request['id']){
+            $classroom = Classroom::findOrFail($request['id']);
+            $users = null;
+            if($classroom)
+                $users = $classroom->users()->get();
+
+            //$result = User::all();
+            return $this->sendResponse($users, 'Users list ');
+
+        }else if(Str::plural($request->query('all', ''))){
             $result = Classroom::all();
             return $this->sendResponse($result, 'Classrooms list ');
         }

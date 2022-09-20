@@ -40,9 +40,13 @@ class ClassroomUserController extends Controller
         }
         $this->authorize('isAdmin');
 
-        if(Str::plural($request->query('all', ''))){
+        if($request['id'] == "all"){
             $result = ClassroomUser::all();
             return $this->sendResponse($result, 'classroom_user list ');
+
+        }else if($request['id']){
+            $result = ClassroomUser::findOrFail($request['id']);
+            return $this->sendResponse($result, 'classroom_user ');
         }
 
 

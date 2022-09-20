@@ -40,11 +40,21 @@ class AssessmentController extends Controller
         }
         $this->authorize('isAdmin');
 
-        if(Str::plural($request->query('all', ''))){
+        
+        if($request['id'] && $request['term'] && $request['year'] ){
+
+            $assessments = Assessment::where([
+                'user_id' => $request['id'],
+                'term' => $request['term'],
+                'year' => $request['year'],
+             ])->get();
+
+            return $this->sendResponse($assessments, 'Assessments list ');
+
+        }else if(Str::plural($request['id'] == 'all')){
             $result = Assessment::all();
             return $this->sendResponse($result, 'Assessments list ');
         }
-
 
 
         $page = $request->query('page', 1);

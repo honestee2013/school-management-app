@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 //use App\Models\Role;
 //use Laratrust\Traits\LaratrustUserTrait;
+use App\Models\Honestee\VueCodeGen\Classroom;
+
 
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
@@ -62,6 +64,17 @@ class User extends Authenticatable // implements MustVerifyEmail
         return 'https://www.gravatar.com/avatar/' . md5(strtolower($this->email)) . '.jpg?s=200&d=mm';
     }
 
+
+    public function classrooms()
+    {
+        return $this->belongsToMany(Classroom::class)->withTimestamps();
+    }
+
+    
+
+
+    
+
     /*public function roles()
     {
         return $this->belongsToMany(Role::class);
@@ -87,4 +100,3 @@ class User extends Authenticatable // implements MustVerifyEmail
         return $this->roles()->where('name', 'User')->exists();
     }*/
 }
-

@@ -60,10 +60,10 @@
           <!-- More options -->
           <nav class="navbar  navbar-light bg-light">
             <span class="navbar-brand">
-              <router-link to="/classrooms">
+              <router-link to="/user-classrooms">
                 <a type="button" class="btn btn-primary btn-sm" role="button" aria-pressed="true">
-                  <i class="nav-icon fas fa-chalkboard-teacher"></i>
-                  Classrooms
+                  <i class="fas fa-chalkboard-teacher" />
+                  User Classrooms
                 </a>
               </router-link>
             </span>
@@ -81,6 +81,8 @@
             </span>
           </nav>
           <!--/ More options -->
+
+
 
           <!-- card-body table container -->
           <div class="card-body table-responsive p-2">
@@ -775,18 +777,12 @@ export default {
 
 
   mounted() {
-    //console.log('classroom Component mounted.')
-    //const urlParams = new URLSearchParams(window.location.search.substring(1));
-    //this.queryId = urlParams.get('queryId');
-    //console.log('xxxxxxxxxxx '+ urlParams.get('queryId') );
-    //this.queryId = this.$route.params.queryId;
-
     //console.log('user Component mounted.')
     this.$Progress.start();
     this.loadClassrooms();
     this.$Progress.finish();
+
   },
-  
 
 
   created() {

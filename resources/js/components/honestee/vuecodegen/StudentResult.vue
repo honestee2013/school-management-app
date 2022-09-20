@@ -84,10 +84,10 @@
 
 
 <nav class="navbar navbar-light bg-light">
-      <form class="form-inline">
-        <input type="text" class="form-control"  placeholder="User Number">
+      <form class="form-inline"  @submit.prevent="showResult" >
+        <input  v-model="userNumber" type="text" class="form-control" required = "required" placeholder="User Number">
         
-        <select class="custom-select m-sm-2 my-2  " >
+        <select v-model="resultYear" class="custom-select m-sm-2 my-2" required = "required" >
             <option selected>Select Session</option>
             <option value="2022">2022</option>
             <option value="2023">2023</option>
@@ -100,11 +100,11 @@
             <option value="2030">2030</option>
         </select>
 
-        <select class="custom-select mr-sm-2" >
+        <select  v-model="resultTerm"  class="custom-select mr-sm-2" required = "required">
             <option selected>Select Term</option>
-            <option value="1">First</option>
-            <option value="2">Second</option>
-            <option value="3">Third</option>
+            <option value="First">First</option>
+            <option value="Second">Second</option>
+            <option value="Third">Third</option>
         </select>
 
         <button type="submit" class="btn btn-primary my-2">Check</button>
@@ -340,13 +340,22 @@ export default {
   data() {
     return {
       editmode: false,
-      assessments: [],
       search: '',
 
       isLoading: false,
       totalRecords: 0,
       clickedRow: null,
       selectedRows: [],
+
+
+
+      userNumber: '',
+      resultTerm: '',
+      resultYear: '',
+      user: '',
+      classrooms: [],
+      users: [],
+      assessments: [],
 
 
       sections: [],
@@ -807,6 +816,67 @@ export default {
     },
 
 
+    showResult(){
+        //console.log( this.userNumber+" "+ this.resultTerm+" "+this.resultYear );
+
+        try {
+          var url = "api/users?userNumber="+this.userNumber;
+          axios.get(url).then(user => {
+            if (user.data.data) {
+              //console.log(user.data.data);
+              this.user = user.data.data;
+
+
+              url = "api/users?q=classroom&id="+this.user.id;
+                axios.get(url).then(classrooms => {
+                  if (classrooms.data.data) {
+                    //console.log(classrooms.data.data.reverse());
+                    this.classrooms = classrooms.data.data.reverse();
+                  }
+              });
+
+              url = "api/classrooms?q=users&id="+this.classrooms[0].id;
+                axios.get(url).then(users => {
+                  if (users.data.data) {
+                    //console.log(users.data.data.reverse());
+                    this.users = users.data.data;
+                  }
+              });
+
+
+              url = "api/assessments?id="+this.user.id+"&term="+ this.resultTerm+"&year="+ this.resultYear;
+              axios.get(url).then(assessments => {
+                if (assessments.data.data) {
+                  console.log(assessments.data.data);
+                  this.assessments = assessments.data.data;
+                }
+              });
+
+
+
+
+
+
+
+
+
+
+
+
+            }
+          });
+
+
+        } catch (error) {
+          console.log(error.message);
+        };
+
+
+
+
+    }
+
+
 
 
   },
@@ -821,7 +891,6 @@ export default {
     this.loadUsers();
     this.loadSubjects();
     this.$Progress.finish();
-
   },
 
 
@@ -829,7 +898,6 @@ export default {
     this.$Progress.start();
     this.loadAssessments();
     this.$Progress.finish();
-
   },
 
 
