@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Schema;
 
 use App\Models\Honestee\VueCodeGen\Assessment;
+use App\Models\Honestee\VueCodeGen\Subject;
 
 
 use DB;
@@ -43,13 +44,13 @@ class AssessmentController extends Controller
         
         if($request['id'] && $request['term'] && $request['year'] ){
 
-            $assessments = Assessment::where([
+            $assessments = Assessment::select("subject_id", "name", "type", "score")->where([
                 'user_id' => $request['id'],
                 'term' => $request['term'],
                 'year' => $request['year'],
              ])->get();
 
-            return $this->sendResponse($assessments, 'Assessments list ');
+            return $this->sendResponse($this->prepareResult( $assessments), 'Assessments list ');
 
         }else if(Str::plural($request['id'] == 'all')){
             $result = Assessment::all();
@@ -84,6 +85,81 @@ class AssessmentController extends Controller
             $assessments = $query->paginate( $perPage );
   
         return $this->sendResponse($assessments, 'Assessments list ');
+    }
+
+
+    public function prepareResult($assessment){
+
+        //$newAssessment = [];
+        /*$newAssessment = $assessment->each(function ($item, $key) {
+            //if($key == "subject_id")
+                //$newAssessment["Subject"] = Subject::find($item)->name;
+            //else   
+                return [$key => "xxxxxxxxx"];
+        });*/
+
+        $assessment = $assessment->groupBy('subject_id');
+
+
+        $newAssessment = $assessment->map(function ($item, $key) {  
+            //$key = Subject::find($key)->name;
+            $formattedAssessments = [];
+            $CA = 0;
+            $exams = 0;
+            foreach($item as $ass){
+                $subject = Subject::find($ass->subject_id)->name;
+                $formattedAssessments[$subject]["subject"] = $subject;
+
+                if($ass->name == "Assignment" || $ass->name == "Test"){
+                    $CA = $CA + $ass->score;
+                    $formattedAssessments[$subject]["ca"] = $CA;  
+                }else if($ass->name == "Exams"){
+                    $exams = $ass->score;
+                    $formattedAssessments[$subject]["exams"] = $ass->score;
+                }  
+                
+                $formattedAssessments[$subject]["total"] = $exams + $CA;
+
+
+
+                //$formattedAssessments[$subject];// = ass[i]->subject_id;
+
+                /*if($ass->name == "Assignment" && $ass->type == "First")
+                    $formattedAssessments[$subject]["firstCA"] = $ass->score;
+                else if($ass->name == "Assignment" && $ass->type == "Second")
+                    $formattedAssessments[$subject]["secondCA"] = $ass->score;
+                else if($ass->name == "Assignment" && $ass->type == "Third")
+                    $formattedAssessments[$subject]["thirdCA"] = $ass->score;
+
+                if($ass->name == "Test" && $ass->type == "First")
+                    $formattedAssessments[$subject]["firstTest"] = $ass->score;
+                else if($ass->name == "Test" && $ass->type == "Second")
+                    $formattedAssessments[$subject]["secondTest"] = $ass->score;
+                else if($ass->name == "Test" && $ass->type == "Third")
+                    $formattedAssessments[$subject]["thirdTest"] = $ass->score;  
+                else if($ass->name == "Exams")
+                    $formattedAssessments[$subject]["Exams"] = $ass->score;*/ 
+                //else
+                  //  $formattedAssessments[$key] = $item; 
+                
+                //if($key == "subject_id")
+                    //$formattedAssessments["Subject"] = Subject::find($item)->name;
+                    
+                    //$formattedAssessments["First CA"] = $ass->score;
+                 
+            }
+            return $formattedAssessments;  
+            //return 
+
+        });
+         
+        return $newAssessment->all();
+
+
+        //return $assessment->all();
+        //$group = $assessment->groupBy('subject_id');
+        //$group = $assessment->groupBy('subject_id');
+        //return $group->all();
     }
 
 

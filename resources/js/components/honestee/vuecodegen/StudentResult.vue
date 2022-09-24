@@ -89,8 +89,7 @@
         
         <select v-model="resultYear" class="custom-select m-sm-2 my-2" required = "required" >
             <option selected>Select Session</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
+            <option value="2022/2023">2022/2023</option>
             <option value="2024">2024</option>
             <option value="2025">2025</option>
             <option value="2026">2026</option>
@@ -110,6 +109,41 @@
         <button type="submit" class="btn btn-primary my-2">Check</button>
     </form>
 </nav>
+
+
+
+
+
+<div class="container table-responsive">
+  <h2>Bordered Table</h2>
+  <p>The .table-bordered class adds borders to a table:</p>            
+  <table border="2" >
+    <thead>
+      <tr style="height:100px">
+        <th>SUBJECTS</th>
+        <th class="vert">CA</th>
+        <th class="vert">EXAMS</th>
+        <th class="vert">TOTAL</th>
+        <th class="vert">GRADE</th>
+        <th class="vert">POSITION</th>
+        <th class="vert">GRADE</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr v-for="(assessment, index) in studentAssessments" > 
+          <td  v-for="(value, key) in assessment">{{ JSON.stringify( value.subject ) }}</td>
+
+    
+       
+        </tr>
+     
+    </tbody>
+  </table>
+</div>
+
+
+
+
 
 
 
@@ -355,9 +389,12 @@ export default {
       user: '',
       classrooms: [],
       users: [],
+      studentAssessments: [],
+
+
+
+
       assessments: [],
-
-
       sections: [],
       classrooms: [],
       users: [],
@@ -848,7 +885,75 @@ export default {
               axios.get(url).then(assessments => {
                 if (assessments.data.data) {
                   console.log(assessments.data.data);
-                  this.assessments = assessments.data.data;
+                  this.studentAssessments = assessments.data.data;
+
+                  /*var formattedAssessments = {};
+                  const subject_ids  =  Object.keys( assessments.data.data );
+                  subject_ids.forEach(function (subject_id, index) {
+                       var ass = assessments.data.data[subject_id];
+                       for (var i = 0; i < ass.length; i++){
+                        //formattedAssessments.subject_id = assessments.data.data[subject_id][ass[i]];
+                        //var subject = (this.subjects.find(a => a.id === item))? (this.subjects.find(a => a.id === item).name) : "";
+                        formattedAssessments[subject_id] = ass[i].subject_id;
+                        if(ass[i].name == "CA" && ass[i].type == "First")
+                            formattedAssessments["First CA"] = ass[i].score;
+                        else if(ass[i].name == "CA" && ass[i].type == "Second")
+                            formattedAssessments["Second CA"] = ass[i].score;
+                        else if(ass[i].name == "CA" && ass[i].type == "Third")
+                            formattedAssessments["Third CA"] = ass[i].score;
+                        else if(ass[i].name == "Test" && ass[i].type == "First")
+                            formattedAssessments["First Test"] = ass[i].score;
+                        else if(ass[i].name == "Test" && ass[i].type == "Second")
+                            formattedAssessments["Second Test"] = ass[i].score;
+                        else if(ass[i].name == "Test" && ass[i].type == "Third")
+                            formattedAssessments["Third Test"] = ass[i].score;
+                        else if(ass[i].name == "Exams")
+                            formattedAssessments["Exams"] = ass[i].score;                            
+
+
+                        //console.log( JSON.stringify( ass[i].subject_id ) );
+
+                       }
+                    
+                  });*/
+                  
+                  //console.log( JSON.stringify( formattedAssessments ) );
+                  //console.log( JSON.stringify( this.subjects ) );
+
+                  /*try {
+
+                    var formattedAssessments = {};
+                    const subject_ids  =  Object.keys( assessments.data.data );
+                    subject_ids.forEach(function (subject_id, index) {
+                      const ass =  Object.keys( assessments.data.data[subject_id]);
+                      console.log( JSON.stringify( ass ) );
+
+                      //formattedAssessments = Object.values( assessments.data.data[subject_id])
+
+                     
+
+                    } );
+
+
+
+                  } catch(error){
+                    console.log(error.message);
+                  }*/
+                  
+
+
+                  //for(var i= 0; i<ass.length; i++ )
+                      //console.log( JSON.stringify( ass[i]) )+" xxxxxx ";
+
+                  
+                  
+                  //this.studentAssessments = assessments.data.data;
+
+
+
+
+
+
                 }
               });
 
@@ -917,6 +1022,20 @@ export default {
     width: 100%;
   }
 }
+
+
+
+th.vert{
+  transform: rotate(270deg);
+  text-align: center;
+  
+}
+
+
+
+
+
+
 </style>
 
 

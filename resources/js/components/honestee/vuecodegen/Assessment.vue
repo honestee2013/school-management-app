@@ -13,10 +13,10 @@
               <tr>
                 <th>School Section</th>
                 <th>Classroom</th>
-                <th>User</th>
+                <th>Student</th>
                 <th>Subject</th>
                 <th>Assessment Name</th>
-                <th>Year</th>
+                <th>Session</th>
                 <th>Term</th>
                 <th>Assessment Sequence</th>
                 <th>Score</th>
@@ -242,7 +242,7 @@
 
               </div>
               <div class="form-group">
-                <label>Section</label>
+                <label>School Section</label>
                 <select v-model="form.section_id" name="section_id" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'section_id' ) }">
                   <option v-for="(item, index)  in sections" :key="index" :value="item.id"> {{item.name}} </option>
@@ -260,7 +260,7 @@
 
               </div>
               <div class="form-group">
-                <label>User</label>
+                <label>Student</label>
                 <select v-model="form.user_id" name="user_id" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'user_id' ) }">
                   <option v-for="(item, index)  in users" :key="index" :value="item.id"> {{item.name}} </option>
@@ -281,7 +281,7 @@
                 <label>Name</label>
                 <select v-model="form.name" name="name" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'name' ) }">
-                  <option> CA </option>
+                  <option> Assignment </option>
                   <option> Test </option>
                   <option> Exams </option>
                 </select>
@@ -289,18 +289,14 @@
 
               </div>
               <div class="form-group">
-                <label>Year</label>
+                <label>Session</label>
                 <select v-model="form.year" name="year" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'year' ) }">
-                  <option> 2022 </option>
-                  <option> 2023 </option>
-                  <option> 2024 </option>
-                  <option> 2025 </option>
-                  <option> 2026 </option>
-                  <option> 2027 </option>
-                  <option> 2028 </option>
-                  <option> 2029 </option>
-                  <option> 2030 </option>
+                  <option>2022/2023</option>
+                  <option>2024/2025</option>
+                  <option>2026/2027</option>
+                  <option>2028/2029</option>
+                  <option>2030/2030</option>
                 </select>
                 <has-error :form="form" field="year"></has-error>
 
@@ -508,10 +504,10 @@ export default {
       table_heders: {
         "Section": "section_id",
         "Classroom": "classroom_id",
-        "User": "user_id",
+        "Student": "user_id",
         "Subject": "subject_id",
         "Assessment Name": "name",
-        "Year": "year",
+        "Session": "year",
         "Term": "term",
         "Sequence": "type",
         "Score": "score",
@@ -534,7 +530,7 @@ export default {
           hidden: false
         },
         {
-          label: "User",
+          label: "Student",
           field: "user_id",
           hidden: false
         },
@@ -549,7 +545,7 @@ export default {
           hidden: false
         },
         {
-          label: "Year",
+          label: "Session",
           field: "year",
           hidden: false
         },

@@ -21,8 +21,8 @@ class CreateAssessmentsTable extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('subject_id')->unsigned();
 
-            $table->enum('name', ['CA','Test','Exams']);
-            $table->enum('year', ['2022','2023','2024','2025','2026','2027','2028','2029','2030']);
+            $table->enum('name', ['Assignment','Test','Exams']);
+            $table->enum('year', ['2022/2023','2024/2025','2026/2027','2028/2029','2030/2031']);
             $table->enum('term', ['First','Second','Third']);
             $table->enum('type', ['First','Second','Third']);
             $table->float("score");
