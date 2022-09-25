@@ -10,6 +10,9 @@ class Classroom extends Model
 {
     use UsesTenantConnection;
 
+    public $timestamps = true;
+
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -18,6 +21,14 @@ class Classroom extends Model
     protected $guarded = [
         'id'
     ];
+
+
+    protected $fillable = [
+        'created_at',
+        'updated_at',
+        'section_id',
+        'name'
+    ]; 
 
     /**
      * The attributes that should be cast to native types.

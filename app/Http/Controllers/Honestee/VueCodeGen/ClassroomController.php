@@ -18,6 +18,7 @@ use Str;
 
 class ClassroomController extends Controller
 {
+    
     /**
      * Create a new controller instance.
      *
@@ -140,11 +141,18 @@ class ClassroomController extends Controller
         $relation = Str::plural($request->query('tbl', ''));
 
         if($model_id && $relation &&  $pv_ids){ // Many to Many relationships
-            $query = $model::find($model_id)->{$relation}()->sync( explode(",", $pv_ids) );
+            $query = $model::find($model_id)->{$relation}()->sync( explode(",", $pv_ids) )->withTimestamps();
             return $this->sendResponse($query, ucfirst($relation)." were attached to the ".ucfirst($request->query('pv_tbl', '')." Successfully"));
         } else {
             $this->checkValidation($request);
-            $classroom = Classroom::create($request->all());    
+            $classroom = Classroom::insert(
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'section_id' => $request["section_id"],
+                    'name' => $request["name"],
+                ]
+            );//create($request->all());    
             return $this->sendResponse( $classroom, 'Classroom Created Successfully');
         }
 

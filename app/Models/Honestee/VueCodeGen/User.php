@@ -70,6 +70,11 @@ class User extends Authenticatable // implements MustVerifyEmail
         return $this->belongsToMany(Classroom::class)->withTimestamps();
     }
 
+    public function currentClassroom()
+    {
+        return $this->belongsToMany(Classroom::class)->orderBy('id', 'desc')->take(1);
+    }
+
     
 
 

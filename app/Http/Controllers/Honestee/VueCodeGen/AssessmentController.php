@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Schema;
 
 use App\Models\Honestee\VueCodeGen\Assessment;
 use App\Models\Honestee\VueCodeGen\Subject;
+use App\Models\Honestee\VueCodeGen\Classroom;
+use App\Models\Honestee\VueCodeGen\User;
 
 
 use DB;
@@ -43,14 +45,31 @@ class AssessmentController extends Controller
 
         
         if($request['id'] && $request['term'] && $request['year'] ){
+            
+            //$result = User::where("id", $request['id'])->first()->classrooms()->orderBy('created_at', 'desc')->first();;
+            //$result = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
+            //$result = User::where("id", $request['id'])->first()->with("currentClassroom")->get();
+            //return $this->sendResponse($result, 'Assessments list ');
 
-            $assessments = Assessment::select("subject_id", "name", "type", "score")->where([
-                'user_id' => $request['id'],
-                'term' => $request['term'],
-                'year' => $request['year'],
-             ])->get();
+            //Classroom::find($assessments->first()->classroom_id)->users()->get();
 
-            return $this->sendResponse($this->prepareResult( $assessments), 'Assessments list ');
+
+
+            //$userAssessments = $this->getUserAssessments($request['id'], $request['term'] , $request['year']);
+            $classroomId = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
+
+            $classroomAssessments = $this->getClassroomAssessments($classroomId, $request['term'] , $request['year']);
+            //$classroomAssessments = $this->getClassroomAssessments($userAssessments->first()->classroom_id, $request['term'] , $request['year']);
+            
+            $preparedClassroomResult = $this->prepareClassroomResult( $classroomAssessments);
+
+            if (array_key_exists($request['id'], $preparedClassroomResult))
+                return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result list ');
+            else
+                return $this->sendResponse(null, 'No result with user id: '.$request['id']." found!");
+
+            //$students = Classroom::find($assessments->first()->classroom_id)->users()->get();
+            //return $this->sendResponse($this->prepareUserResult( $assessments), 'Assessments list ');
 
         }else if(Str::plural($request['id'] == 'all')){
             $result = Assessment::all();
@@ -88,18 +107,38 @@ class AssessmentController extends Controller
     }
 
 
-    public function prepareResult($assessment){
+    public function getUserAssessments($userId, $term, $year){
+        if($userId && $term && $year){
+            return Assessment::select("classroom_id", "subject_id", "name", "type", "score")->where([
+                'user_id' => $userId,
+                'term' => $term,
+                'year' => $year,
+             ])->get();
+        }
 
-        //$newAssessment = [];
-        /*$newAssessment = $assessment->each(function ($item, $key) {
-            //if($key == "subject_id")
-                //$newAssessment["Subject"] = Subject::find($item)->name;
-            //else   
-                return [$key => "xxxxxxxxx"];
-        });*/
+        return null;
+    }
 
+
+    public function getClassroomAssessments($classId, $term, $year){
+        if($classId && $term && $year){
+            return Assessment::select("user_id", "subject_id", "name", "type", "score")->where([
+                'classroom_id' => $classId,
+                'term' => $term,
+                'year' => $year,
+             ])->get();
+        }
+
+        return null;
+    }
+
+
+
+
+    public function prepareUserResult($assessment){
+
+        
         $assessment = $assessment->groupBy('subject_id');
-
 
         $newAssessment = $assessment->map(function ($item, $key) {  
             //$key = Subject::find($key)->name;
@@ -120,47 +159,130 @@ class AssessmentController extends Controller
                 
                 $formattedAssessments[$subject]["total"] = $exams + $CA;
 
+                //$subjectStatistics = $this->getSubjectStatistics($ass->term, $ass->year, $ass, $ass->subject_id);
+                //$formattedAssessments[$subject]["highestScore"] = $subjectStatistics['highest'];
 
-
-                //$formattedAssessments[$subject];// = ass[i]->subject_id;
-
-                /*if($ass->name == "Assignment" && $ass->type == "First")
-                    $formattedAssessments[$subject]["firstCA"] = $ass->score;
-                else if($ass->name == "Assignment" && $ass->type == "Second")
-                    $formattedAssessments[$subject]["secondCA"] = $ass->score;
-                else if($ass->name == "Assignment" && $ass->type == "Third")
-                    $formattedAssessments[$subject]["thirdCA"] = $ass->score;
-
-                if($ass->name == "Test" && $ass->type == "First")
-                    $formattedAssessments[$subject]["firstTest"] = $ass->score;
-                else if($ass->name == "Test" && $ass->type == "Second")
-                    $formattedAssessments[$subject]["secondTest"] = $ass->score;
-                else if($ass->name == "Test" && $ass->type == "Third")
-                    $formattedAssessments[$subject]["thirdTest"] = $ass->score;  
-                else if($ass->name == "Exams")
-                    $formattedAssessments[$subject]["Exams"] = $ass->score;*/ 
-                //else
-                  //  $formattedAssessments[$key] = $item; 
-                
-                //if($key == "subject_id")
-                    //$formattedAssessments["Subject"] = Subject::find($item)->name;
-                    
-                    //$formattedAssessments["First CA"] = $ass->score;
-                 
             }
-            return $formattedAssessments;  
-            //return 
+
+            return $formattedAssessments;  // Next subject
 
         });
          
         return $newAssessment->all();
-
-
-        //return $assessment->all();
-        //$group = $assessment->groupBy('subject_id');
-        //$group = $assessment->groupBy('subject_id');
-        //return $group->all();
     }
+
+
+
+
+    public function prepareClassroomResult($assessments){
+        $assessments = $assessments->groupBy('user_id');
+        $newAssessment = $assessments->map(function ($item, $key) {  // All subjects assessments
+            //$key = Subject::find($key)->name;
+            $formattedAssessments = [];
+            $CA = 0;
+            $exams = 0;
+            foreach($item as $ass){ // Single subject assessment
+                //$userId = $ass->user_id;
+                $subject = Subject::find($ass->subject_id)->name;
+                $formattedAssessments[$subject]["subject"] = $subject;
+                $formattedAssessments[$subject]["subjectId"] = $ass->subject_id;
+
+                if($ass->name == "Assignment" || $ass->name == "Test"){
+                    $CA = $CA + $ass->score;
+                    $formattedAssessments[$subject]["ca"] = $CA;  
+                }else if($ass->name == "Exams"){
+                    $exams = $ass->score;
+                    $formattedAssessments[$subject]["exams"] = $ass->score;
+                }  
+
+                $formattedAssessments[$subject]["total"] = $exams + $CA;
+            }
+
+            return $formattedAssessments;  // Next subject
+        });
+
+        return $this->setSubjectStatistics($newAssessment->all());
+
+         
+        //return $newAssessment->all();
+    }
+
+
+    public function getGrade($score) {
+        if( $score >= 75)
+            return "A"; 
+        else if( $score >= 60)
+            return "B"; 
+        else if( $score >= 50)
+            return "C";   
+        else if( $score >= 45)
+            return "D";       
+        else if( $score >= 40)
+            return "E";      
+    }
+
+    public function setSubjectStatistics($formattedAssessments) {
+
+        $userAllSubjectsScores = [];
+        $subjectStatistics = [];
+        $userSubjects = [];
+
+
+       $userIds = array_keys($formattedAssessments);
+       for($id=0; $id < count( $userIds) ; $id++){
+            $userSubjects = array_keys($formattedAssessments[$userIds[$id]]);
+            for($subject=0; $subject < count( $userSubjects) ; $subject++){
+                $total = $formattedAssessments[ $userIds[$id] ][ $userSubjects[$subject] ]["total"];
+                // Each user id with his corresponding all subjects total scores
+                $userAllSubjectsScores[$userIds[$id]][ $userSubjects[$subject] ] = $total;
+            }
+       }
+
+        //Extracting the max, min and ave
+       $userIds = array_keys($userAllSubjectsScores);
+       for($id=0; $id < count( $userIds) ; $id++){
+            $userSubjects = array_keys($userAllSubjectsScores[$userIds[$id]]);
+            for($subject=0; $subject < count( $userSubjects) ; $subject++){
+                $subjectName = $userSubjects[$subject];
+                $subjectScore = $userAllSubjectsScores[$userIds[$id]][$subjectName];
+
+            // Initialize the statistic variable
+            if(empty($subjectStatistics[$subjectName]["max"]))
+                $subjectStatistics[$subjectName]["max"] = -1000; // Seed lowest to find the max val
+            if(empty($subjectStatistics[$subjectName]["min"]))
+                $subjectStatistics[$subjectName]["min"] = 1000; // Seed highest to find the min val
+            if(empty($subjectStatistics[$subjectName]["ave"])){
+                $subjectScores = array_filter(array_column($userAllSubjectsScores, $subjectName));
+                $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);
+            }
+
+            // User with max score
+            if($subjectScore > $subjectStatistics[$subjectName]["max"] ){
+                $subjectStatistics[$subjectName]["max"] = $subjectScore;
+                $subjectStatistics[$subjectName]["maxScoreUserId"] = $userIds[$id];                
+            }
+
+            // User with min score
+            if($subjectScore < $subjectStatistics[$subjectName]["min"] ){
+                $subjectStatistics[$subjectName]["min"] = $subjectScore; 
+                $subjectStatistics[$subjectName]["minScoreUserId"] = $userIds[$id];                
+            }
+                
+        }
+
+        // Add the statistics to each user result
+        for($id=0; $id < count( $userIds) ; $id++)
+            $formattedAssessments[$userIds[$id]]["subjectStatistics"] = $subjectStatistics;
+
+       }
+
+        return $formattedAssessments;
+
+    }
+
+
+
+
 
 
     public function search($request, $query)
