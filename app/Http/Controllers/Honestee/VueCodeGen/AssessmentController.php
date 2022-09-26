@@ -192,6 +192,7 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
                 }  
 
                 $formattedAssessments[$subject]["total"] = $exams + $CA;
+                $formattedAssessments[$subject]["grade"] = $this->getGrade($exams + $CA);
             }
 
             return $formattedAssessments;  // Next subject
@@ -219,7 +220,7 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
 
     public function setSubjectStatistics($formattedAssessments) {
 
-        $userAllSubjectsScores = [];
+        $allUsersAllSubjectsScores = [];
         $subjectStatistics = [];
         $userSubjects = [];
 
@@ -229,11 +230,12 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
             for($subject=0; $subject < count( $userSubjects) ; $subject++){
                 $total = $formattedAssessments[ $userIds[$id] ][ $userSubjects[$subject] ]["total"];
                 // Each user id with his corresponding all subjects total scores
-                $userAllSubjectsScores[$userIds[$id]][ $userSubjects[$subject] ] = $total;
+                $allUsersAllSubjectsScores[$userIds[$id]][ $userSubjects[$subject] ] = $total;
+                
             }
        }
 
-       $subjectStatistics = $this->getSubjectStatistics($userIds, $userAllSubjectsScores);
+       $subjectStatistics = $this->getSubjectStatistics($userIds, $allUsersAllSubjectsScores);
 
        for($id=0; $id < count( $userIds) ; $id++){
             $userSubjects = array_keys($formattedAssessments[$userIds[$id]]);
@@ -244,38 +246,37 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
                 $formattedAssessments[$userIds[$id]][ $subjectName]["ave"] = $subjectStatistics[$subjectName]["ave"];
                 $formattedAssessments[$userIds[$id]][ $subjectName]["maxScoreUserId"] = $subjectStatistics[$subjectName]["maxScoreUserId"];
                 $formattedAssessments[$userIds[$id]][ $subjectName]["minScoreUserId"] = $subjectStatistics[$subjectName]["minScoreUserId"];
+                $formattedAssessments[$userIds[$id]][ $subjectName]["subjectPosition"] = $subjectStatistics[$userIds[$id]][$subjectName]["subjectPosition"];
             }
         }
         return $formattedAssessments;
     }
 
 
-    
-    public function getSubjectStatistics($userIds, $userAllSubjectsScores){
+
+    public function getSubjectStatistics($userIds, $allUsersAllSubjectsScores){
         $subjectStatistics = [];
 
         for($id=0; $id < count( $userIds) ; $id++){
-            $userSubjects = array_keys($userAllSubjectsScores[$userIds[$id]]);
+            $userSubjects = array_keys($allUsersAllSubjectsScores[$userIds[$id]]);
             for($subject=0; $subject < count( $userSubjects) ; $subject++){
                 $subjectName = $userSubjects[$subject];
-                $subjectScore = $userAllSubjectsScores[$userIds[$id]][$subjectName];
+                $subjectScore = $allUsersAllSubjectsScores[$userIds[$id]][$subjectName];
 
                 // Initialize the statistic variable
                 if(empty($subjectStatistics[$subjectName]["max"]))
                     $subjectStatistics[$subjectName]["max"] = -1000; // Seed lowest to find the max val
                 if(empty($subjectStatistics[$subjectName]["min"]))
                     $subjectStatistics[$subjectName]["min"] = 1000; // Seed highest to find the min val
+                
+
+                $subjectScores = array_filter(array_column($allUsersAllSubjectsScores, $subjectName));
+                $subjectStatistics[$userIds[$id]][$subjectName]["subjectPosition"] = $this->getSubjectPosition($subjectScores, $subjectScore);
+
                 if(empty($subjectStatistics[$subjectName]["ave"])){
-                    $subjectScores = array_filter(array_column($userAllSubjectsScores, $subjectName));
                     $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);
                 }
 
-                //if(empty($subjectStatistics[$subjectName]["ave"])){
-                    /*$subjectScores = array_filter(array_column($userAllSubjectsScores, $subjectName));
-                    $subjectStatistics[$subjectName]["min"] = min($subjectScores);
-                    $subjectStatistics[$subjectName]["max"] = max($subjectScores);
-                    $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);*/
-                //}
 
                 // User with max score
                 if($subjectScore > $subjectStatistics[$subjectName]["max"] ){
@@ -292,10 +293,27 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
        }
 
        return $subjectStatistics;
-
-
     }
 
+
+
+    public function getSubjectPosition($allSubjectScores, $subjectScore){
+        rsort($allSubjectScores); // Sort in descending order
+        $pos = array_search($subjectScore, $allSubjectScores) + 1;
+        return $this->getOrdinalValue($pos);
+    }
+
+
+    public function getOrdinalValue($number){
+        //$formatter = new NumberFormatter('en-US', NumberFormatter::ORDINAL);
+        //return $formatter->format($num);
+        $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+        if ((($number % 100) >= 11) && (($number%100) <= 13))
+            return $number. 'th';
+        else
+            return $number. $ends[$number % 10];
+        
+    }
 
 
 

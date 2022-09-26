@@ -124,8 +124,8 @@
         <th class="vert">CA</th>
         <th class="vert">EXAMS</th>
         <th class="vert">TOTAL</th>
-
         <th class="vert">GRADE</th>
+
         <th class="vert">SUBJECT POSITION</th>
 
         <th class="vert">SUBJECT HIGHEST</th>
@@ -139,12 +139,14 @@
           <td  >{{ assessment.ca }}</td>
           <td  >{{ assessment.exams }}</td>
           <td  >{{ assessment.total }}</td>
+          <td  >{{ assessment.grade }}</td>
 
-          <td  ></td>
-          <td  ></td>
-          <td  v-for="(statistics, key) in (studentAssessments)" :key="key" v-if="key==assessment.subject">
-            {{ statistics }}
-          </td>
+          <td  >{{ assessment.subjectPosition }}</td>
+
+          <td  >{{ assessment.max }}</td>
+          <td  >{{ assessment.min }}</td>
+          <td  >{{ assessment.ave }}</td>
+
 
     
        
