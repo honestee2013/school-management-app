@@ -90,13 +90,13 @@
         <select v-model="resultYear" class="custom-select m-sm-2 my-2" required = "required" >
             <option selected>Select Session</option>
             <option value="2022/2023">2022/2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
-            <option value="2028">2028</option>
-            <option value="2029">2029</option>
-            <option value="2030">2030</option>
+            <option value="2023/2024">2023/2024</option>
+            <option value="2024/2025">2024/2025</option>
+            <option value="2025/2026">2025/2026</option>
+            <option value="2026/2027">2026/2027</option>
+            <option value="2027/2028">2027/2028</option>
+            <option value="2028/2029">2028/2029</option>
+            <option value="2029/2030">2029/2030</option>
         </select>
 
         <select  v-model="resultTerm"  class="custom-select mr-sm-2" required = "required">
@@ -124,14 +124,27 @@
         <th class="vert">CA</th>
         <th class="vert">EXAMS</th>
         <th class="vert">TOTAL</th>
+
         <th class="vert">GRADE</th>
-        <th class="vert">POSITION</th>
-        <th class="vert">GRADE</th>
+        <th class="vert">SUBJECT POSITION</th>
+
+        <th class="vert">SUBJECT HIGHEST</th>
+        <th class="vert">SUBJECT LOWEST</th>
+        <th class="vert">SUBJECT AVERAGE</th>
       </tr>
     </thead>
     <tbody>
-        <tr v-for="(assessment, index) in studentAssessments" > 
-          <td  v-for="(value, key) in assessment">{{ JSON.stringify( value.subject ) }}</td>
+        <tr v-for="(assessment, key) in studentAssessments" :key="key"> 
+          <td  >{{ assessment.subject }}</td>
+          <td  >{{ assessment.ca }}</td>
+          <td  >{{ assessment.exams }}</td>
+          <td  >{{ assessment.total }}</td>
+
+          <td  ></td>
+          <td  ></td>
+          <td  v-for="(statistics, key) in (studentAssessments)" :key="key" v-if="key==assessment.subject">
+            {{ statistics }}
+          </td>
 
     
        

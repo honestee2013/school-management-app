@@ -46,22 +46,18 @@ class AssessmentController extends Controller
         
         if($request['id'] && $request['term'] && $request['year'] ){
             
-            //$result = User::where("id", $request['id'])->first()->classrooms()->orderBy('created_at', 'desc')->first();;
-            //$result = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
-            //$result = User::where("id", $request['id'])->first()->with("currentClassroom")->get();
-            //return $this->sendResponse($result, 'Assessments list ');
-
+       
             //Classroom::find($assessments->first()->classroom_id)->users()->get();
-
-
-
             //$userAssessments = $this->getUserAssessments($request['id'], $request['term'] , $request['year']);
             $classroomId = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
-
             $classroomAssessments = $this->getClassroomAssessments($classroomId, $request['term'] , $request['year']);
             //$classroomAssessments = $this->getClassroomAssessments($userAssessments->first()->classroom_id, $request['term'] , $request['year']);
-            
             $preparedClassroomResult = $this->prepareClassroomResult( $classroomAssessments);
+
+
+
+return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result list ');
+
 
             if (array_key_exists($request['id'], $preparedClassroomResult))
                 return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result list ');
@@ -202,8 +198,6 @@ class AssessmentController extends Controller
         });
 
         return $this->setSubjectStatistics($newAssessment->all());
-
-         
         //return $newAssessment->all();
     }
 
@@ -221,12 +215,13 @@ class AssessmentController extends Controller
             return "E";      
     }
 
+
+
     public function setSubjectStatistics($formattedAssessments) {
 
         $userAllSubjectsScores = [];
         $subjectStatistics = [];
         $userSubjects = [];
-
 
        $userIds = array_keys($formattedAssessments);
        for($id=0; $id < count( $userIds) ; $id++){
@@ -238,45 +233,66 @@ class AssessmentController extends Controller
             }
        }
 
-        //Extracting the max, min and ave
-       $userIds = array_keys($userAllSubjectsScores);
+       $subjectStatistics = $this->getSubjectStatistics($userIds, $userAllSubjectsScores);
+
        for($id=0; $id < count( $userIds) ; $id++){
+            $userSubjects = array_keys($formattedAssessments[$userIds[$id]]);
+            for($subject=0; $subject < count( $userSubjects) ; $subject++){
+                $subjectName = $userSubjects[$subject];
+                $formattedAssessments[$userIds[$id]][ $subjectName]["max"] = $subjectStatistics[$subjectName]["max"];
+                $formattedAssessments[$userIds[$id]][ $subjectName]["min"] = $subjectStatistics[$subjectName]["min"];
+                $formattedAssessments[$userIds[$id]][ $subjectName]["ave"] = $subjectStatistics[$subjectName]["ave"];
+                $formattedAssessments[$userIds[$id]][ $subjectName]["maxScoreUserId"] = $subjectStatistics[$subjectName]["maxScoreUserId"];
+                $formattedAssessments[$userIds[$id]][ $subjectName]["minScoreUserId"] = $subjectStatistics[$subjectName]["minScoreUserId"];
+            }
+        }
+        return $formattedAssessments;
+    }
+
+
+    
+    public function getSubjectStatistics($userIds, $userAllSubjectsScores){
+        $subjectStatistics = [];
+
+        for($id=0; $id < count( $userIds) ; $id++){
             $userSubjects = array_keys($userAllSubjectsScores[$userIds[$id]]);
             for($subject=0; $subject < count( $userSubjects) ; $subject++){
                 $subjectName = $userSubjects[$subject];
                 $subjectScore = $userAllSubjectsScores[$userIds[$id]][$subjectName];
 
-            // Initialize the statistic variable
-            if(empty($subjectStatistics[$subjectName]["max"]))
-                $subjectStatistics[$subjectName]["max"] = -1000; // Seed lowest to find the max val
-            if(empty($subjectStatistics[$subjectName]["min"]))
-                $subjectStatistics[$subjectName]["min"] = 1000; // Seed highest to find the min val
-            if(empty($subjectStatistics[$subjectName]["ave"])){
-                $subjectScores = array_filter(array_column($userAllSubjectsScores, $subjectName));
-                $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);
-            }
+                // Initialize the statistic variable
+                if(empty($subjectStatistics[$subjectName]["max"]))
+                    $subjectStatistics[$subjectName]["max"] = -1000; // Seed lowest to find the max val
+                if(empty($subjectStatistics[$subjectName]["min"]))
+                    $subjectStatistics[$subjectName]["min"] = 1000; // Seed highest to find the min val
+                if(empty($subjectStatistics[$subjectName]["ave"])){
+                    $subjectScores = array_filter(array_column($userAllSubjectsScores, $subjectName));
+                    $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);
+                }
 
-            // User with max score
-            if($subjectScore > $subjectStatistics[$subjectName]["max"] ){
-                $subjectStatistics[$subjectName]["max"] = $subjectScore;
-                $subjectStatistics[$subjectName]["maxScoreUserId"] = $userIds[$id];                
-            }
+                //if(empty($subjectStatistics[$subjectName]["ave"])){
+                    /*$subjectScores = array_filter(array_column($userAllSubjectsScores, $subjectName));
+                    $subjectStatistics[$subjectName]["min"] = min($subjectScores);
+                    $subjectStatistics[$subjectName]["max"] = max($subjectScores);
+                    $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);*/
+                //}
 
-            // User with min score
-            if($subjectScore < $subjectStatistics[$subjectName]["min"] ){
-                $subjectStatistics[$subjectName]["min"] = $subjectScore; 
-                $subjectStatistics[$subjectName]["minScoreUserId"] = $userIds[$id];                
-            }
+                // User with max score
+                if($subjectScore > $subjectStatistics[$subjectName]["max"] ){
+                    $subjectStatistics[$subjectName]["max"] = $subjectScore;
+                    $subjectStatistics[$subjectName]["maxScoreUserId"] = $userIds[$id];                
+                } 
                 
-        }
-
-        // Add the statistics to each user result
-        for($id=0; $id < count( $userIds) ; $id++)
-            $formattedAssessments[$userIds[$id]]["subjectStatistics"] = $subjectStatistics;
-
+                if($subjectScore < $subjectStatistics[$subjectName]["min"] ){
+                    $subjectStatistics[$subjectName]["min"] = $subjectScore; 
+                    $subjectStatistics[$subjectName]["minScoreUserId"] = $userIds[$id];                
+                }
+                
+            }
        }
 
-        return $formattedAssessments;
+       return $subjectStatistics;
+
 
     }
 
