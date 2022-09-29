@@ -112,48 +112,185 @@
 
 
 
+<div class="container table-responsive py-5" style="background:gray; width:100% ">
+  
+  <div class="col" id = "result-sheet" style=" background:white; max-width: 900px; min-width:900px; min-height: 1000px; margin:auto; padding:1%;">
+    <div class="row my-3" id = "result-sheet-border" style="width:96%; border: solid 3px;   margin:auto; padding:1%">
+
+          <div class="row mb-2" style=" height:auto; width:96.7% ; margin:auto; padding:1%;">
+            <div class="mx-1" style="width:20%; "><img style="width:100%; max-height:130px " src= "/images/batch.jpeg" /></div>
+            <div class="mx-1" style="width:55%; text-align:center">
+              <p> 
+                <h2>Some School Name</h2>
+                <span> Motto: Some school motto <br /></span> 
+                <span> Address: Some school Address </span> 
+                <span> Contact: 08123456789, Schoolname@email.com </span> 
+              </p> 
+              <h5>STUDENT REPORT SHEET</h5>
+
+            </div>
+            <div class="mx-1" style="width:20%; ">
+              <!---<img style="width:100%; max-height:130px " src= "/images/passpor.jpg" /> -->
+              <i style="font-size:8em; color:gray" class="fa fa-user"></i> 
+            </div>
+          </div>  
+
+          <div class="row mb-2" style="border-top: solid 2px; border-bottom: solid 2px; height:auto; width:96.7% ; margin:auto; padding:1%;">
+            <div class="mx-1" style="width:32.3%">
+              <table border="2" style="width:100%">
+                <tr style=""><th class="">Session:</th><td>2022/2023</td></tr>
+                <tr style=""><th class="">Term:</th><td>First</td></tr>
+                <tr style=""><th class="">Resumption Date:</th><td>2022/2023</td></tr>
+              </table>
+            </div>
+            <div class="mx-1" style="width:32.3%">
+              <table border="2" style="width:100%">
+                <tr style=""><th class="">Classroom:</th><td> </td></tr>
+                <tr style=""><th class="">No. of Students:</th><td>First</td></tr>
+                <tr style=""><th class="">Class Teacher:</th><td></td></tr>
+              </table>
+            </div>
+            <div class="mx-1" style="width:32.3%">
+              <table border="2" style="width:100%">
+                <tr style="text-align:center"><th class="">STUDENT FULL NAME</th></tr>
+                <tr style="text-align:center"><th class="">REGISTRATION NUMBER</th></tr>
+                <tr style="text-align:center"><th class="">POSITION</th></tr>
+              </table>
+            </div>
+          </div>
+
+          <div class="col-8">
+            
+              <table border="2" style="width:100%; border-collapse: collapse;">
+                  <tr style="height:100px">
+                    <td >SCHOOL SUBJECTS</td>
+                    <th class="vert">CA</th>
+                    <th class="vert">EXAMS</th>
+                    <th class="vert">TOTAL</th>
+                    <th class="vert">GRADE</th>
+
+                    <th class="vert">POSITION</th>
+
+                    <th class="vert">HIGHEST</th>
+                    <th class="vert">LOWEST</th>
+                    <th class="vert">AVERAGE</th>
+                  </tr>
+                <tbody>
+                    <tr v-for="(assessment, key) in studentAssessments" :key="key"> 
+                      <th  >{{ assessment.subject }}</th>
+                      <td  >{{ assessment.ca }}</td>
+                      <td  >{{ assessment.exams }}</td>
+                      <td  >{{ assessment.total }}</td>
+                      <td  >{{ assessment.grade }}</td>
+
+                      <td  >{{ assessment.subjectPosition }}</td>
+
+                      <td  >{{ assessment.max }}</td>
+                      <td  >{{ assessment.min }}</td>
+                      <td  >{{ assessment.ave }}</td>
+
+                    </tr>
+                
+                </tbody>
+              </table>
+          </div>
+
+          <div class="col-4">
+            <table border="2" style="width:100%">
+                <thead>
+                  <tr>
+                    <th colspan = "2" style = "text-align:center; font-size:14pt"> EFFECTIVE SKILLS </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th>PUNCTUALITY</th><td></td></tr>
+                  <tr><th>POLITENESS</th><td></td></tr>
+                  <tr><th>NEATNESS</th><td></td></tr>
+                  <tr><th>HONESTY</th><td></td></tr>
+                  <tr><th>LEADERSHIP SKILL</th><td></td></tr>
+                  <tr><th>COOPERATION</th><td></td></tr>
+                  <tr><th>ATTENTIVENESS</th><td></td></tr>
+                  <tr><th>PERSEVERANCE</th><td></td></tr>
+                  <tr><th>ATTITUDE TO WORK</th><td></td></tr>
+                </tbody>
+              </table>
+
+              <table border="2" style="width:100%; margin-top:1em">
+                <thead>
+                  <tr>
+                    <th colspan = "2" style = "text-align:center; font-size:14pt"> PSYCHOMOTOR SKILLS </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th>HANDWRITING</th><td></td></tr>
+                  <tr><th>VERBAL FLUENCY</th><td></td></tr>
+                  <tr><th>SPORT</th><td></td></tr>
+                  <tr><th>HANDLING TOOLS</th><td></td></tr>
+                  <tr><th>DRAWING AND PAINTING</th><td></td></tr>
+                  <tr><th>COOPERATION</th><td></td></tr>
+                  <tr><th>ATTENTIVENESS</th><td></td></tr>
+                  <tr><th>PERSEVERANCE</th><td></td></tr>
+                  <tr><th>ATTITUDE TO WORK</th><td></td></tr>
+                </tbody>
+              </table>
 
 
-<div class="container table-responsive">
-  <h2>Bordered Table</h2>
-  <p>The .table-bordered class adds borders to a table:</p>            
-  <table border="2" >
-    <thead>
-      <tr style="height:100px">
-        <th>SUBJECTS</th>
-        <th class="vert">CA</th>
-        <th class="vert">EXAMS</th>
-        <th class="vert">TOTAL</th>
-        <th class="vert">GRADE</th>
-
-        <th class="vert">SUBJECT POSITION</th>
-
-        <th class="vert">SUBJECT HIGHEST</th>
-        <th class="vert">SUBJECT LOWEST</th>
-        <th class="vert">SUBJECT AVERAGE</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr v-for="(assessment, key) in studentAssessments" :key="key"> 
-          <td  >{{ assessment.subject }}</td>
-          <td  >{{ assessment.ca }}</td>
-          <td  >{{ assessment.exams }}</td>
-          <td  >{{ assessment.total }}</td>
-          <td  >{{ assessment.grade }}</td>
-
-          <td  >{{ assessment.subjectPosition }}</td>
-
-          <td  >{{ assessment.max }}</td>
-          <td  >{{ assessment.min }}</td>
-          <td  >{{ assessment.ave }}</td>
+              <table border="2" style="width:100%; margin-top:1em">
+                <thead>
+                  <tr>
+                    <th colspan = "2" style = "text-align:center; font-size:14pt">GRADING SYSTEM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th>A</th><td>75-100</td></tr>
+                  <tr><th>B</th><td>70-74</td></tr>
+                  <tr><th>C</th><td>50-59</td></tr>
+                  <tr><th>D</th><td>45-49</td></tr>
+                  <tr><th>E</th><td>40-44</td></tr>
+                  <tr><th>F</th><td>0-39</td></tr>
+                </tbody>
+              </table>
 
 
-    
-       
-        </tr>
-     
-    </tbody>
-  </table>
+          </div>
+
+          <div class="row my-2" style="border-top: solid 2px; border-bottom: solid 2px; height:auto; width:96.7% ; margin:auto; padding:1%;">
+            <div class="mx-1" style="width:100%">
+              <table border="2" style="width:100%">
+                <tr style=""> 
+                  <th rowspan = "2" class="">SUMMARY</th> <th> TOTAL SCORE </th> <th> AVERAGE SCORE </th> <th> GRADE </th></tr>
+                  <tr style=""> <td>10000</td>  <td>85.8</td> <td>A</td> </tr>
+              </table>
+            </div>
+
+            <div class="mx-1" style="width:75%">
+              <table border="2" style="width:100%; margin-top:0.5em">
+                <tr style="text-align:center"><th class="">CLASS TEACHER COMMENT</th></tr>
+                <tr style=""><td>Some comments by the class teacher</td></tr>
+              </table>
+              <table border="2" style="width:100%; margin-top:0.5em">
+                <tr style="text-align:center"><th class="">PRINCIPAL/HEADTEACHER COMMENT</th></tr>
+                <tr style=""><td>Some comments by the class teacher</td></tr>
+              </table>
+              
+              <br /> <strong>A MESSAGE TO THE PARENTS:</strong>
+             <p> 
+              Some message to the parents. Some message to the parents.Some message to the parents.
+              Some message to the parents. Some message to the parents.Some message to the parents.
+              </p>
+            </div>
+            <div class="circle" style="width:23%; padding:0.3em; font-size:20pt; transform: rotate(-45deg); text-align:center; border: solid 1px; margin-top:3em;">
+              SCHOOL STAMP
+            </div>
+
+          </div>
+
+
+
+
+    </div>
+  </div>
+
 </div>
 
 
@@ -1041,11 +1178,28 @@ export default {
 
 
 th.vert{
-  transform: rotate(270deg);
-  text-align: center;
-  
+  transform: rotate(180deg);
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  line-height: 1;
+  position: relative;
+  padding: 0.7em;
 }
 
+
+.circle {
+    background-color:#fff;
+    border:1px solid red;    
+    height:100px;
+    border-radius:50%;
+    -moz-border-radius:50%;
+    -webkit-border-radius:50%;
+    width:100px;
+}
+
+th, td {
+  padding-left: 1em
+}
 
 
 

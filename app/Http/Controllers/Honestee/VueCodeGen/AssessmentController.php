@@ -213,7 +213,9 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
         else if( $score >= 45)
             return "D";       
         else if( $score >= 40)
-            return "E";      
+            return "E";    
+        else if( $score < 40)
+            return "F";       
     }
 
 
