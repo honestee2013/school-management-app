@@ -3,7 +3,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../../mypackages/vuecodegen"
+            "url": "./vuecodegen"
         }
     ],
 

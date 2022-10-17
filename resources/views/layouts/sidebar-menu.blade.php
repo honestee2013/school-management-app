@@ -57,7 +57,7 @@
         <ul class="nav nav-treeview">
 
           <li class="nav-item">
-            <router-link to="/assessments" class="nav-link">
+            <router-link to="/student-result" class="nav-link">
               <i class="nav-icon fas fa-award green"></i>
               <p>
                 Students Result

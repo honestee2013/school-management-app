@@ -23,7 +23,7 @@
                       
 
                         <div class="form-group row">
-                            <label for="pincode" class="col-md-4 col-form-label text-md-right">{{ __('Registration code 10-digits') }}</label>
+                            <label for="pincode" class="col-md-4 col-form-label text-md-right">{{ __('Registration code (8-10 digits)') }}</label>
 
                             <div class="col-md-6">
                                 <input id="pincode" type="text" class="form-control @error('pincode') is-invalid @enderror" name="pincode" value="{{ old('pincode') }}" required autocomplete="pincode" autofocus>

@@ -69,7 +69,7 @@ class RegisterController extends Controller
     {
         $fields = [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:App\Models\Honestee\VueCodeGen\User,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
 
@@ -89,6 +89,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        
         $code = null;
         $roleName = $data['role'];
         if($roleName == 'school-owner')
@@ -194,6 +195,17 @@ class RegisterController extends Controller
 
 
     protected function createTenantInfo($dbName){
+        // Clean up
+        $dbName = strtolower($dbName);
+        $dbName = str_replace("www.", "", $dbName); // remove if added
+        $dbName = str_replace("ww.", "", $dbName); // remove if added
+
+        $TDNPos = strrpos($dbName, "."); // position of .com, .ng etc
+        if($TDNPos)
+            $dbName = substr($dbName, 0, $TDNPos); // remove .com, .ng etc
+
+        $dbName = preg_replace('/[^a-z0-9]/', '', $dbName); // Remove all char except AlphaNumeric
+
 
         $domain =  $dbName.".".Request::getHost();
 
@@ -232,7 +244,7 @@ class RegisterController extends Controller
 
         if($role == "parent")
             $prefix = "PAR";
-        else if($role == "parent")
+        else if($role == "student")
             $prefix = "STU";
 
         $lastUserNumber = Option::where('key', $prefix.'LastUserNumber')->first();
@@ -248,6 +260,7 @@ class RegisterController extends Controller
         if($lastUserNumberYear < intval(date('y'))) // New year. Reset lastUserNumber
             $lastUserNumber = 0;
 
+
         $lastUserNumber = $lastUserNumber + 1 ; // Increase for new user number
 
         $userNumber = $prefix.dechex(Tenant::current()->id)."-".str_pad($lastUserNumber, 3, '0', STR_PAD_LEFT);
@@ -258,8 +271,9 @@ class RegisterController extends Controller
             $userNumber = $prefix.dechex(Tenant::current()->id)."-".str_pad($lastUserNumber, 3, '0', STR_PAD_LEFT);
         }
 
-        option([$prefix.'LastUserNumber' => intval($lastUserNumber)]);
-        option([$prefix.'LastUserNumberYear' => intval(date('y'))]);
+
+        Option::updateOrCreate(['key' => $prefix.'LastUserNumber'], ['key' => $prefix.'LastUserNumber', 'value' => intval($lastUserNumber)] );
+        Option::updateOrCreate(['key' => $prefix.'LastUserNumberYear'], ['key' => $prefix.'LastUserNumberYear', 'value' => intval(date('y'))] );
 
         return $userNumber;
     

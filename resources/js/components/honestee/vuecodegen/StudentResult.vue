@@ -199,7 +199,7 @@
             <table border="2" style="width:100%">
                 <thead>
                   <tr>
-                    <th colspan = "2" style = "text-align:center; font-size:14pt"> EFFECTIVE SKILLS </th>
+                    <th colspan = "2" style = "text-align:center; font-size:12pt"> EFFECTIVE SKILLS </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -218,7 +218,7 @@
               <table border="2" style="width:100%; margin-top:1em">
                 <thead>
                   <tr>
-                    <th colspan = "2" style = "text-align:center; font-size:14pt"> PSYCHOMOTOR SKILLS </th>
+                    <th colspan = "2" style = "text-align:center; font-size:12pt"> PSYCHOMOTOR SKILLS </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -238,7 +238,7 @@
               <table border="2" style="width:100%; margin-top:1em">
                 <thead>
                   <tr>
-                    <th colspan = "2" style = "text-align:center; font-size:14pt">GRADING SYSTEM</th>
+                    <th colspan = "2" style = "text-align:center; font-size:12pt">GRADING SYSTEM</th>
                   </tr>
                 </thead>
                 <tbody>

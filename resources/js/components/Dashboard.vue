@@ -3,31 +3,34 @@
         <div class="container-fluid">
             <div class="row ">
                 <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box">
-                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
+                    <router-link to="/sections" style = "text-decoration: none; color: inherit;">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info elevation-1"><i class="fas fa-chart-pie"></i></span>
 
-                        <div class="info-box-content">
-                            <span class="info-box-text">CPU Traffic</span>
-                            <span class="info-box-number">
-                            10
-                            <small>%</small>
-                            </span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">School Sections</span>
+                                <span class="info-box-number">
+                                    {{ sections.length  }} 
+                                </span>
+                            </div>
+                            <!-- /.info-box-content -->
                         </div>
-                        <!-- /.info-box-content -->
-                    </div>
+                    </router-link>
+
                     <!-- /.info-box -->
                 </div>
                 <!-- /.col -->
                 <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-up"></i></span>
-
-                        <div class="info-box-content">
-                            <span class="info-box-text">Likes</span>
-                            <span class="info-box-number">41,410</span>
+                    <router-link to="/classrooms" style = "text-decoration: none; color: inherit ">
+                        <div class="info-box mb-3">
+                            <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-chalkboard-teacher"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Classrooms</span>
+                                <span class="info-box-number"> {{ classrooms.length  }} </span>
+                            </div>
+                            <!-- /.info-box-content -->
                         </div>
-                        <!-- /.info-box-content -->
-                    </div>
+                    </router-link>    
                     <!-- /.info-box -->
                 </div>
                 <!-- /.col -->
@@ -36,38 +39,41 @@
                 <div class="clearfix hidden-md-up"></div>
 
                 <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
-
-                        <div class="info-box-content">
-                            <span class="info-box-text">Sales</span>
-                            <span class="info-box-number">760</span>
+                    <router-link to="/subjects" style = "text-decoration: none; color: inherit ">
+                        <div class="info-box mb-3">
+                            <span class="info-box-icon bg-success elevation-1"><i class="fas fa-clone"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">School Subjects</span>
+                                <span class="info-box-number"> {{ subjects.length  }}  </span>
+                            </div>
+                            <!-- /.info-box-content -->
                         </div>
-                        <!-- /.info-box-content -->
-                    </div>
+                    </router-link>
                     <!-- /.info-box -->
                 </div>
                 <!-- /.col -->
                 <div class="col-12 col-sm-6 col-md-3">
-                    <div class="info-box mb-3">
-                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
-
-                        <div class="info-box-content">
-                            <span class="info-box-text">New Members</span>
-                            <span class="info-box-number">2,000</span>
+                    <router-link to="/users" style = "text-decoration: none; color: inherit ">
+                        <div class="info-box mb-3">
+                            <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Registered Users</span>
+                                <span class="info-box-number"> {{ users.length  }} </span>
+                            </div>
+                        <!-- /.info-box-content -->
                         </div>
-                    <!-- /.info-box-content -->
-                    </div>
+                    </router-link>
                     <!-- /.info-box -->
                 </div>
             <!-- /.col -->
             </div>
             <!-- /.row -->
 
+            <!---
             <div class="row">
-                <!-- Left col -->
+                <!-- Left col -- >
                 <div class="col-md-8">
-                    <!-- MAP & BOX PANE -->
+                    <!-- MAP & BOX PANE -- >
                     <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Latest Orders (Demo)</h3>
@@ -81,7 +87,7 @@
                         </button>
                         </div>
                     </div>
-                    <!-- /.card-header -->
+                    <!-- /.card-header -- >
                     <div class="card-body p-0">
                         <div class="table-responsive">
                         <table class="table m-0">
@@ -146,15 +152,16 @@
                         </table>
                         </div>
                     </div>
-                <!-- /.card-body -->
+                <!-- /.card-body -- >
                 </div>
-                <!-- /.card -->
-                <!-- /.card -->
+                <!-- /.card -- >
+                <!-- /.card -- >
             </div>
             <!-- /.col -->
 
+            <!--
             <div class="col-md-4">
-                <!-- Info Boxes Style 2 -->
+                <!-- Info Boxes Style 2 -- >
                 <div class="info-box mb-3 bg-secondary">
                 <span class="info-box-icon"><i class="fas fa-tag"></i></span>
 
@@ -162,9 +169,9 @@
                     <span class="info-box-text">Inventory</span>
                     <span class="info-box-number">5,200</span>
                 </div>
-                <!-- /.info-box-content -->
+                <!-- /.info-box-content -- >
                 </div>
-                <!-- /.info-box -->
+                <!-- /.info-box -- >
                 <div class="info-box mb-3 bg-success">
                 <span class="info-box-icon"><i class="far fa-heart"></i></span>
 
@@ -172,9 +179,9 @@
                     <span class="info-box-text">Mentions</span>
                     <span class="info-box-number">92,050</span>
                 </div>
-                <!-- /.info-box-content -->
+                <!-- /.info-box-content -- >
                 </div>
-                <!-- /.info-box -->
+                <!-- /.info-box -- >
                 <div class="info-box mb-3 bg-danger">
                 <span class="info-box-icon"><i class="fas fa-cloud-download-alt"></i></span>
 
@@ -182,9 +189,9 @@
                     <span class="info-box-text">Downloads</span>
                     <span class="info-box-number">114,381</span>
                 </div>
-                <!-- /.info-box-content -->
+                <!-- /.info-box-content -- >
                 </div>
-                <!-- /.info-box -->
+                <!-- /.info-box -- >
                 <div class="info-box mb-3 bg-info">
                 <span class="info-box-icon"><i class="far fa-comment"></i></span>
 
@@ -192,11 +199,11 @@
                     <span class="info-box-text">Direct Messages</span>
                     <span class="info-box-number">163,921</span>
                 </div>
-                <!-- /.info-box-content -->
+                <!-- /.info-box-content -- >
                 </div>
-                <!-- /.info-box -->
-            </div>
-            <!-- /.col -->
+                <!-- /.info-box -- >
+            </div>-- >
+            <!-- /.col -- >
             </div>
             <!-- /.row -->
         </div><!--/. container-fluid -->
@@ -205,8 +212,77 @@
 
 <script>
     export default {
+
+        data() {
+            return {
+               
+                classrooms: [],
+                users: [],
+                subjects: [],
+                sections: [],
+            }
+        },
+
+
+
         mounted() {
-            console.log('Component mounted.')
-        }
+            console.log('Component mounted.');
+            this.loadUsers();
+            this.loadClassrooms();
+            this.loadSubjects();
+            this.loadSections();
+        },
+
+        methods: {
+
+            // load pivot_tables data
+            loadUsers() {
+                var url = "api/users";
+                axios.get(url).then(users => {
+                    if (users.data.data.data) {
+                        this.users = users.data.data.data
+                    }
+                });
+            },
+
+
+            // load the table data
+            loadClassrooms() {
+                var url = "api/classrooms";
+                axios.get(url).then(classrooms => {
+                    if (classrooms.data.data.data) {
+                        this.classrooms = classrooms.data.data.data
+                    }
+                });
+            },
+
+
+            // load the table data
+            loadSubjects() {
+                var url = "api/subjects";
+                axios.get(url).then(subjects => {
+                    if (subjects.data.data.data) {
+                        this.subjects = subjects.data.data.data
+                    }
+                });
+            },
+
+
+            // load the table data
+            loadSections() {
+                var url = "api/sections";
+                axios.get(url).then(sections => {
+                    if (sections.data.data.data) {
+                        this.sections = sections.data.data.data
+                    }
+                });
+            },
+
+
+
+
+
+        } 
+
     }
 </script>
