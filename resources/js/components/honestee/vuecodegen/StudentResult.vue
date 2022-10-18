@@ -84,7 +84,7 @@
 
 
 <nav class="navbar navbar-light bg-light">
-      <form class="form-inline"  @submit.prevent="showResult" >
+      <form class="form-inline pt-3 pt-sm-0"  @submit.prevent="editResultMode ? editResult() : showResult()">
         <input  v-model="userNumber" type="text" class="form-control" required = "required" placeholder="User Number">
         
         <select v-model="resultYear" class="custom-select m-sm-2 my-2" required = "required" >
@@ -106,7 +106,10 @@
             <option value="Third">Third</option>
         </select>
 
-        <button type="submit" class="btn btn-primary my-2">Check</button>
+        <button type="submit" class="btn btn-primary my-sm-2 my-3" @click="editResultMode = false">Check</button>
+        <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-if="!editResultMode"  @click="editResultMode = true"> Edit</button>
+        <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-if="editResultMode" @click="saveResult(); editResultMode = false"> Save </button>
+        
     </form>
 </nav>
 
@@ -203,15 +206,15 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><th>PUNCTUALITY</th><td></td></tr>
-                  <tr><th>POLITENESS</th><td></td></tr>
-                  <tr><th>NEATNESS</th><td></td></tr>
-                  <tr><th>HONESTY</th><td></td></tr>
-                  <tr><th>LEADERSHIP SKILL</th><td></td></tr>
-                  <tr><th>COOPERATION</th><td></td></tr>
-                  <tr><th>ATTENTIVENESS</th><td></td></tr>
-                  <tr><th>PERSEVERANCE</th><td></td></tr>
-                  <tr><th>ATTITUDE TO WORK</th><td></td></tr>
+                  <tr><th>PUNCTUALITY</th><td><select v-model="effective_punctuality" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_punctuality}}</span></td></tr>
+                  <tr><th>POLITENESS</th><td><select v-model="effective_politeness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_politeness}}</span></td></tr>
+                  <tr><th>NEATNESS</th><td><select v-model="effective_neatness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_neatness}}</span></td></tr>
+                  <tr><th>HONESTY</th><td><select v-model="effective_honesty" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_honesty}}</span></td></tr>
+                  <tr><th>LEADERSHIP SKILL</th><td><select v-model="effective_leadership_skill" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_leadership_skill}}</span></td></tr>
+                  <tr><th>COOPERATION</th><td><select v-model="effective_cooperation" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_cooperation}}</span></td></tr>
+                  <tr><th>ATTENTIVENESS</th><td><select v-model="effective_attentiveness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_attentiveness}}</span></td></tr>
+                  <tr><th>PERSEVERANCE</th><td><select v-model="effective_perseverance" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_perseverance}}</span></td></tr>
+                  <tr><th>ATTITUDE TO WORK</th><td><select v-model="effective_attitude_to_work" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_attitude_to_work}}</span></td></tr>
                 </tbody>
               </table>
 
@@ -222,15 +225,15 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><th>HANDWRITING</th><td></td></tr>
-                  <tr><th>VERBAL FLUENCY</th><td></td></tr>
-                  <tr><th>SPORT</th><td></td></tr>
-                  <tr><th>HANDLING TOOLS</th><td></td></tr>
-                  <tr><th>DRAWING AND PAINTING</th><td></td></tr>
-                  <tr><th>COOPERATION</th><td></td></tr>
-                  <tr><th>ATTENTIVENESS</th><td></td></tr>
-                  <tr><th>PERSEVERANCE</th><td></td></tr>
-                  <tr><th>ATTITUDE TO WORK</th><td></td></tr>
+                  <tr><th>HANDWRITING</th><td><select v-model="psychomotor_handwriting" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_handwriting}}</span></td></tr>
+                  <tr><th>VERBAL FLUENCY</th><td><select v-model="psychomotor_verbal_fluency" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_verbal_fluency}}</span></td></tr>
+                  <tr><th>SPORT</th><td><select v-model="psychomotor_sport" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_sport}}</span></td></tr>
+                  <tr><th>HANDLING TOOLS</th><td><select v-model="psychomotor_handling_tools" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_handling_tools}}</span></td></tr>
+                  <tr><th>DRAWING AND PAINTING</th><td><select v-model="psychomotor_drawing_and_painting" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_drawing_and_painting}}</span></td></tr>
+                  <tr><th>COOPERATION</th><td><select v-model="psychomotor_cooperation" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_cooperation}}</span></td></tr>
+                  <tr><th>ATTENTIVENESS</th><td><select v-model="psychomotor_attentiveness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_attentiveness}}</span></td></tr>
+                  <tr><th>PERSEVERANCE</th><td><select v-model="psychomotor_perseverance" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_perseverance}}</span></td></tr>
+                  <tr><th>ATTITUDE TO WORK</th><td><select v-model="psychomotor_attitude_to_work" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_attitude_to_work}}</span></td></tr>
                 </tbody>
               </table>
 
@@ -266,18 +269,15 @@
             <div class="mx-1" style="width:75%">
               <table border="2" style="width:100%; margin-top:0.5em">
                 <tr style="text-align:center"><th class="">CLASS TEACHER COMMENT</th></tr>
-                <tr style=""><td>Some comments by the class teacher</td></tr>
+                <tr ><td><textarea style="width:100%" v-model="form_master_comment" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{form_master_comment}}</span></td></tr>
               </table>
               <table border="2" style="width:100%; margin-top:0.5em">
                 <tr style="text-align:center"><th class="">PRINCIPAL/HEADTEACHER COMMENT</th></tr>
-                <tr style=""><td>Some comments by the class teacher</td></tr>
+                <tr style=""><td><textarea style="width:100%" v-model="principal_comment" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{principal_comment}}</span></td></tr>
               </table>
               
               <br /> <strong>A MESSAGE TO THE PARENTS:</strong>
-             <p> 
-              Some message to the parents. Some message to the parents.Some message to the parents.
-              Some message to the parents. Some message to the parents.Some message to the parents.
-              </p>
+              <p><textarea style="width:100%" v-model="message_to_parent" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{message_to_parent}}</span></p>
             </div>
             <div class="circle" style="width:23%; padding:0.3em; font-size:20pt; transform: rotate(-45deg); text-align:center; border: solid 1px; margin-top:3em;">
               SCHOOL STAMP
@@ -525,15 +525,42 @@ import VueHtml2pdf from "vue-html2pdf";
 export default {
   data() {
     return {
+
+      effective_punctuality: 0,
+      effective_politeness: 0,
+      effective_neatness: 0,
+      effective_honesty: 0,
+      effective_leadership_skill: 0,
+      effective_cooperation: 0,
+      effective_attentiveness: 0,
+      effective_perseverance: 0,
+      effective_attitude_to_work: 0,
+
+
+      psychomotor_handwriting: 0,
+      psychomotor_verbal_fluency: 0,
+      psychomotor_sport: 0,
+      psychomotor_handling_tools: 0,
+      psychomotor_drawing_and_painting: 0,
+      psychomotor_cooperation: 0,
+      psychomotor_attentiveness: 0,
+      psychomotor_perseverance: 0,
+      psychomotor_attitude_to_work: 0,
+
+      form_master_comment: "",
+      principal_comment: "",
+      message_to_parent: "",
+
+
+
       editmode: false,
+      editResultMode: false,
       search: '',
 
       isLoading: false,
       totalRecords: 0,
       clickedRow: null,
       selectedRows: [],
-
-
 
       userNumber: '',
       resultTerm: '',
@@ -1004,6 +1031,13 @@ export default {
 
     },
 
+    editResult(){
+        alert("edit mod")
+    },
+
+    saveResult(){
+        alert("saeved")
+    },
 
     showResult(){
         //console.log( this.userNumber+" "+ this.resultTerm+" "+this.resultYear );

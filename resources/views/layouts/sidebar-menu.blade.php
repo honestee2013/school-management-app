@@ -30,10 +30,26 @@
         </a>
         <ul class="nav nav-treeview">
           <li class="nav-item">
-          <router-link to="/assessments" class="nav-link">
+            <router-link to="/assessments" class="nav-link">
               <i class="nav-icon fas fa-spell-check green"></i>
               <p>
                 Students Assessments
+              </p>
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/assessments" class="nav-link">
+              <i class="nav-icon fas fa-chalkboard-teacher green"></i>
+              <p>
+                My Classrooms
+              </p>
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/assessments" class="nav-link">
+              <i class="nav-icon fas fa-clone green"></i>
+              <p>
+                My Subjects
               </p>
             </router-link>
           </li>
