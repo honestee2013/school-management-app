@@ -42,6 +42,8 @@ export default [
 	
 	{ path: '/classroom-users', component: require('./components/honestee/vuecodegen/UserClassroom.vue').default },
 	{ path: '/user-classrooms', component: require('./components/honestee/vuecodegen/ClassroomUser.vue').default },
+	{ path: '/classroom-subjects', component: require('./components/honestee/vuecodegen/SubjectClassroom.vue').default },
+	{ path: '/subject-classrooms', component: require('./components/honestee/vuecodegen/ClassroomSubject.vue').default },
 	{ path: '*', component: require('./components/NotFound.vue').default },
 ];
 

@@ -19,13 +19,13 @@ class UsersTableSeeder extends Seeder
     {
         DB::table('users')->where('email', 'admin@admin.com')->delete();
 
-        DB::table('users')->insert([
+        /*DB::table('users')->insert([
             'name' => 'John Doe',
             'email' => 'admin@admin.com',
             'password' => bcrypt('password'),
             'created_at' => now(),
             'updated_at' => now(),
             //'type' => 'admin',
-        ]);
+        ]);*/
     }
 }

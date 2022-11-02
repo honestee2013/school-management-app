@@ -107,8 +107,8 @@
         </select>
 
         <button type="submit" class="btn btn-primary my-sm-2 my-3" @click="editResultMode = false">Check</button>
-        <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-if="!editResultMode"  @click="editResultMode = true"> Edit</button>
-        <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-if="editResultMode" @click="saveResult(); editResultMode = false"> Save </button>
+        <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-if="!editResultMode && user"  @click="editResultMode = true"> Edit</button>
+        <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-if="editResultMode && user" @click="saveResult()"> Save </button>
         
     </form>
 </nav>
@@ -179,18 +179,13 @@
                     <th class="vert">AVERAGE</th>
                   </tr>
                 <tbody>
-                    <tr v-for="(assessment, key) in studentAssessments" :key="key"> 
-                      <th  >{{ assessment.subject }}</th>
-                      <td  >{{ assessment.ca }}</td>
-                      <td  >{{ assessment.exams }}</td>
-                      <td  >{{ assessment.total }}</td>
-                      <td  >{{ assessment.grade }}</td>
+                    <tr v-for="(subject, key) in classroomSubjects" :key="key"> 
+                      <th  >{{ subject.name }}</th>
 
-                      <td  >{{ assessment.subjectPosition }}</td>
-
-                      <td  >{{ assessment.max }}</td>
-                      <td  >{{ assessment.min }}</td>
-                      <td  >{{ assessment.ave }}</td>
+                      <td v-if = "1==1">
+                        {{  JSON.stringify( studentAssessmentSubjects )}}
+                      </td>
+                  
 
                     </tr>
                 
@@ -526,6 +521,7 @@ export default {
   data() {
     return {
 
+      
       effective_punctuality: 0,
       effective_politeness: 0,
       effective_neatness: 0,
@@ -547,9 +543,15 @@ export default {
       psychomotor_perseverance: 0,
       psychomotor_attitude_to_work: 0,
 
-      form_master_comment: "",
-      principal_comment: "",
-      message_to_parent: "",
+      form_master_comment: "NIL",
+      principal_comment: "NIL",
+
+      message_to_parent: "NIL",
+      message_to_student: "NIL",
+      message_to_staff: "NIL",
+
+      classroomSubjects: [], 
+      studentAssessmentSubjects: [],
 
 
 
@@ -1032,12 +1034,67 @@ export default {
     },
 
     editResult(){
-        alert("edit mod")
+        //alert("edit mod")
     },
 
+
+
     saveResult(){
-        alert("saeved")
+      //alert("save")
+      this.editResultMode = false;
+      if(!this.user) // Nothing to save
+        return;
+    
+
+      var parameters = "?resultinfo=set"; 
+      //parameters = parameters + "&page=" + this.serverParams.page;
+      parameters = parameters + "&effective_punctuality=" + this.effective_punctuality;
+      parameters = parameters + "&effective_politeness=" + this.effective_politeness;
+      parameters = parameters + "&effective_neatness=" + this.effective_neatness;
+      parameters = parameters + "&effective_honesty=" + this.effective_honesty;
+      parameters = parameters + "&effective_leadership_skill=" + this.effective_leadership_skill;
+      parameters = parameters + "&effective_cooperation=" + this.effective_cooperation;
+      parameters = parameters + "&effective_attentiveness=" + this.effective_attentiveness;
+      parameters = parameters + "&effective_perseverance=" + this.effective_perseverance;
+      parameters = parameters + "&effective_attitude_to_work=" + this.effective_attitude_to_work;
+
+      parameters = parameters + "&psychomotor_handwriting=" + this.psychomotor_handwriting;
+      parameters = parameters + "&psychomotor_verbal_fluency=" + this.psychomotor_verbal_fluency;
+      parameters = parameters + "&psychomotor_sport=" + this.psychomotor_sport;
+      parameters = parameters + "&psychomotor_handling_tools=" + this.psychomotor_handling_tools;
+      parameters = parameters + "&psychomotor_drawing_and_painting=" + this.psychomotor_drawing_and_painting;
+      parameters = parameters + "&psychomotor_cooperation=" + this.psychomotor_cooperation;
+      parameters = parameters + "&psychomotor_attentiveness=" + this.psychomotor_attentiveness;
+      parameters = parameters + "&psychomotor_perseverance=" + this.psychomotor_perseverance;
+      parameters = parameters + "&psychomotor_attitude_to_work=" + this.psychomotor_attitude_to_work;
+
+      parameters = parameters + "&form_master_comment=" + this.form_master_comment;
+      parameters = parameters + "&principal_comment=" + this.principal_comment;
+      
+      parameters = parameters + "&message_to_parent=" + this.message_to_parent;
+      parameters = parameters + "&message_to_student=" + this.message_to_student;
+      parameters = parameters + "&message_to_staff=" + this.message_to_staff;
+
+      parameters = parameters + "&user_id=" + 0;
+      parameters = parameters + "&user_number=" + this.userNumber;
+      parameters = parameters + "&session=" + this.resultYear;
+      parameters = parameters + "&term=" + this.resultTerm;
+
+
+   
+      var url = "api/assessments" + parameters;
+      try {
+        axios.get(url).then(response => {
+          if (response.data.data) {
+           // this.sections = sections.data.data;
+          }
+        });
+      } catch (error) {
+        console.log(error.message);
+      };
+
     },
+
 
     showResult(){
         //console.log( this.userNumber+" "+ this.resultTerm+" "+this.resultYear );
@@ -1069,94 +1126,66 @@ export default {
 
               url = "api/assessments?id="+this.user.id+"&term="+ this.resultTerm+"&year="+ this.resultYear;
               axios.get(url).then(assessments => {
-                if (assessments.data.data) {
-                  console.log(assessments.data.data);
+                /*if (assessments.data.data) {
+                  //console.log(assessments.data.data);
                   this.studentAssessments = assessments.data.data;
-
-                  /*var formattedAssessments = {};
-                  const subject_ids  =  Object.keys( assessments.data.data );
-                  subject_ids.forEach(function (subject_id, index) {
-                       var ass = assessments.data.data[subject_id];
-                       for (var i = 0; i < ass.length; i++){
-                        //formattedAssessments.subject_id = assessments.data.data[subject_id][ass[i]];
-                        //var subject = (this.subjects.find(a => a.id === item))? (this.subjects.find(a => a.id === item).name) : "";
-                        formattedAssessments[subject_id] = ass[i].subject_id;
-                        if(ass[i].name == "CA" && ass[i].type == "First")
-                            formattedAssessments["First CA"] = ass[i].score;
-                        else if(ass[i].name == "CA" && ass[i].type == "Second")
-                            formattedAssessments["Second CA"] = ass[i].score;
-                        else if(ass[i].name == "CA" && ass[i].type == "Third")
-                            formattedAssessments["Third CA"] = ass[i].score;
-                        else if(ass[i].name == "Test" && ass[i].type == "First")
-                            formattedAssessments["First Test"] = ass[i].score;
-                        else if(ass[i].name == "Test" && ass[i].type == "Second")
-                            formattedAssessments["Second Test"] = ass[i].score;
-                        else if(ass[i].name == "Test" && ass[i].type == "Third")
-                            formattedAssessments["Third Test"] = ass[i].score;
-                        else if(ass[i].name == "Exams")
-                            formattedAssessments["Exams"] = ass[i].score;                            
-
-
-                        //console.log( JSON.stringify( ass[i].subject_id ) );
-
-                       }
-                    
-                  });*/
-                  
-                  //console.log( JSON.stringify( formattedAssessments ) );
-                  //console.log( JSON.stringify( this.subjects ) );
-
-                  /*try {
-
-                    var formattedAssessments = {};
-                    const subject_ids  =  Object.keys( assessments.data.data );
-                    subject_ids.forEach(function (subject_id, index) {
-                      const ass =  Object.keys( assessments.data.data[subject_id]);
-                      console.log( JSON.stringify( ass ) );
-
-                      //formattedAssessments = Object.values( assessments.data.data[subject_id])
-
-                     
-
-                    } );
-
-
-
-                  } catch(error){
-                    console.log(error.message);
-                  }*/
-                  
-
-
-                  //for(var i= 0; i<ass.length; i++ )
-                      //console.log( JSON.stringify( ass[i]) )+" xxxxxx ";
+                  //this.studentAssessmentSubjects = assessments.data.data.keys();
+                  //console.log(assessments.data.data.keys());
 
                   
-                  
-                  //this.studentAssessments = assessments.data.data;
 
 
+                  if(assessments.data.data.classroomSubjects)
+                    this.classroomSubjects = assessments.data.data.classroomSubjects;
 
+                  //alert(JSON.stringify(assessments.data.data.studentResultInfo.length));
 
+                  if(assessments.data.data.studentResultInfo.length){
+                    this.effective_punctuality = assessments.data.data.studentResultInfo[0].effective_punctuality;
+                    this.effective_politeness = assessments.data.data.studentResultInfo[0].effective_politeness;
+                    this.effective_neatness = assessments.data.data.studentResultInfo[0].effective_neatness;
+                    this.effective_honesty = assessments.data.data.studentResultInfo[0].effective_honesty;
+                    this.effective_leadership_skill = assessments.data.data.studentResultInfo[0].effective_leadership_skill;
+                    this.effective_cooperation = assessments.data.data.studentResultInfo[0].effective_cooperation;
+                    this.effective_attentiveness = assessments.data.data.studentResultInfo[0].effective_attentiveness;
+                    this.effective_perseverance = assessments.data.data.studentResultInfo[0].effective_perseverance;
+                    this.effective_attitude_to_work = assessments.data.data.studentResultInfo[0].effective_attitude_to_work;
 
+                    this.psychomotor_handwriting = assessments.data.data.studentResultInfo[0].psychomotor_handwriting;
+                    this.psychomotor_verbal_fluency = assessments.data.data.studentResultInfo[0].psychomotor_verbal_fluency;
+                    this.psychomotor_sport = assessments.data.data.studentResultInfo[0].psychomotor_sport;
+                    this.psychomotor_handling_tools = assessments.data.data.studentResultInfo[0].psychomotor_handling_tools;
+                    this.psychomotor_drawing_and_painting = assessments.data.data.studentResultInfo[0].psychomotor_drawing_and_painting;
+                    this.psychomotor_cooperation = assessments.data.data.studentResultInfo[0].psychomotor_cooperation;
+                    this.psychomotor_attentiveness = assessments.data.data.studentResultInfo[0].psychomotor_attentiveness;
+                    this.psychomotor_perseverance = assessments.data.data.studentResultInfo[0].psychomotor_perseverance;
+                    this.psychomotor_attitude_to_work = assessments.data.data.studentResultInfo[0].psychomotor_attitude_to_work;
 
-                }
+                    this.form_master_comment = assessments.data.data.studentResultInfo[0].form_master_comment;
+                    this.principal_comment = assessments.data.data.studentResultInfo[0].principal_comment;
+
+                    this.message_to_parent = assessments.data.data.studentResultInfo[0].message_to_parent;
+                    this.message_to_student = assessments.data.data.studentResultInfo[0].message_to_student;
+                    this.message_to_staff = assessments.data.data.studentResultInfo[0].message_to_staff;
+                  }
+
+                }*/
               });
+              
+            } else {
+              console.log("Data not found!");
 
-
-
-
-
-
-
-
-
-
-
-
+              Swal.fire({
+                position: 'top-end',
+                icon: 'error',
+                title: 'No record found!</strong>',
+                showConfirmButton: false,
+                timer: 2500
+              })
+              
             }
-          });
 
+          });
 
         } catch (error) {
           console.log(error.message);

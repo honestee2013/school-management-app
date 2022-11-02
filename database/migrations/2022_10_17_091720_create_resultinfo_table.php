@@ -13,7 +13,7 @@ class CreateResultinfoTable extends Migration
      */
     public function up()
     {
-        Schema::create('resultinfo', function (Blueprint $table) {
+        Schema::create('resultinfos', function (Blueprint $table) {
             $table->id();
 
             $table->string("result_scope")->default("school"); // School, Classroom, Student
@@ -41,17 +41,17 @@ class CreateResultinfoTable extends Migration
             $table->tinyInteger("psychomotor_attitude_to_work");
 
             //COMMENTS: 
-            $table->text("form_master_comment");
-            $table->text("principal_comment");
+            $table->text("form_master_comment")->defaults("");
+            $table->text("principal_comment")->defaults("");;
 
             //MESSAGES: 
-            $table->text("message_to_parent");
-            $table->text("message_to_student");
-            $table->text("message_to_staff");
+            $table->text("message_to_parent")->defaults("");;
+            $table->text("message_to_student")->defaults("");;
+            $table->text("message_to_staff")->defaults("");;
 
             //SCHOOL-FEES:
-            $table->integer("debt");
-            $table->integer("next_term_school_fees");
+            $table->integer("debt")->defaults(0);
+            $table->integer("next_term_school_fees")->defaults(0);
 
             //OTHERS:
             $table->boolean("hold_result")->default(true);
@@ -59,10 +59,12 @@ class CreateResultinfoTable extends Migration
 
             $table->bigInteger('section_id')->unsigned(); 
             $table->bigInteger('owner_id')->unsigned(); // User_id, classroom_id, school_id
+
             $table->string('user_number'); // Student number
             $table->string("session");
             $table->string("term");
-            $table->string("next_term_begins_on");
+
+            $table->string("next_term_begins_on")->defaults("");
 
             $table->timestamps();
         });
@@ -75,6 +77,6 @@ class CreateResultinfoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('resultinfo');
+        Schema::dropIfExists('resultinfos');
     }
 }

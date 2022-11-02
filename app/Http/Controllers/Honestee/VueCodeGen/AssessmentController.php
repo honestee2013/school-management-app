@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Schema;
 
+use App\Models\Honestee\VueCodeGen\Resultinfo;
 use App\Models\Honestee\VueCodeGen\Assessment;
 use App\Models\Honestee\VueCodeGen\Subject;
 use App\Models\Honestee\VueCodeGen\Classroom;
@@ -21,6 +22,10 @@ use Str;
 
 class AssessmentController extends Controller
 {
+
+
+    public $classroomSubjects;
+
     /**
      * Create a new controller instance.
      *
@@ -29,6 +34,8 @@ class AssessmentController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+
+        $this->classroomSubjects = [];
     }
 
     /**
@@ -43,7 +50,11 @@ class AssessmentController extends Controller
         }
         $this->authorize('isAdmin');
 
-        
+        if($request['resultinfo'] == 'get' )
+            return $this->getResultinfo($request);
+        else if($request['resultinfo'] == 'set' )
+            return $this->setResultinfo($request);
+
         if($request['id'] && $request['term'] && $request['year'] ){
             
        
@@ -51,12 +62,17 @@ class AssessmentController extends Controller
             //$userAssessments = $this->getUserAssessments($request['id'], $request['term'] , $request['year']);
             $classroomId = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
             $classroomAssessments = $this->getClassroomAssessments($classroomId, $request['term'] , $request['year']);
+            //$this->classroomSubjects = Classroom::find($classroomId)->subjects;
             //$classroomAssessments = $this->getClassroomAssessments($userAssessments->first()->classroom_id, $request['term'] , $request['year']);
-            $preparedClassroomResult = $this->prepareClassroomResult( $classroomAssessments);
+            
+            
+            $preparedClassroomResult = $this->prepareClassroomResult( $request,  $classroomAssessments);
 
 
 
-return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result list ');
+//return $this->sendResponse($preparedClassroomResult, 'Result list ');
+//return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result list ');
+//return $this->sendResponse($classroomSubjects, 'Result list ');
 
 
             if (array_key_exists($request['id'], $preparedClassroomResult))
@@ -103,6 +119,67 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
     }
 
 
+    public function setResultInfo(Request $request){
+
+        $resultInfo = Resultinfo::firstOrNew( 
+            array(
+                'session' => $request['session'],
+                'term' => $request['term'],
+                'user_number' => $request['user_number']
+            ) 
+        );
+        
+        $resultInfo->result_scope = 'student';
+        $resultInfo->user_number = $request['user_number'];
+        $resultInfo->owner_id = $request['user_id'];
+
+        $resultInfo->effective_punctuality = $request['effective_punctuality'];
+        $resultInfo->effective_politeness = $request['effective_politeness'];
+        $resultInfo->effective_neatness = $request['effective_neatness'];
+        $resultInfo->effective_honesty = $request['effective_honesty'];
+        $resultInfo->effective_leadership_skill = $request['effective_leadership_skill'];
+        $resultInfo->effective_cooperation = $request['effective_cooperation'];
+        $resultInfo->effective_attentiveness = $request['effective_attentiveness'];
+        $resultInfo->effective_perseverance = $request['effective_perseverance'];
+        $resultInfo->effective_attitude_to_work = $request['effective_attitude_to_work'];
+
+        $resultInfo->psychomotor_handwriting = $request['psychomotor_handwriting'];
+        $resultInfo->psychomotor_verbal_fluency = $request['psychomotor_verbal_fluency'];
+        $resultInfo->psychomotor_sport = $request['psychomotor_sport'];
+        $resultInfo->psychomotor_handling_tools = $request['psychomotor_handling_tools'];
+        $resultInfo->psychomotor_drawing_and_painting = $request['psychomotor_drawing_and_painting'];
+        $resultInfo->psychomotor_cooperation = $request['psychomotor_cooperation'];
+        $resultInfo->psychomotor_attentiveness = $request['psychomotor_attentiveness'];
+        $resultInfo->psychomotor_perseverance = $request['psychomotor_perseverance'];
+        $resultInfo->psychomotor_attitude_to_work = $request['psychomotor_attitude_to_work'];
+
+        $resultInfo->form_master_comment = $request['form_master_comment'];
+        $resultInfo->principal_comment = $request['principal_comment'];
+
+        $resultInfo->message_to_parent = $request['message_to_parent'];
+        $resultInfo->message_to_student = $request['message_to_student'];
+        $resultInfo->message_to_staff = $request['message_to_staff'];
+        
+        $resultInfo->debt = 0;
+        $resultInfo->next_term_school_fees = 0;
+        $resultInfo->section_id = 0;
+        $resultInfo->next_term_begins_on = '0';
+
+
+        $resultInfo->session = $request['session'];
+        $resultInfo->term = $request['term'];
+        $resultInfo->save();
+
+
+        return $this->sendResponse($resultInfo, "set Info00000");
+
+
+
+
+
+    }
+
+
     public function getUserAssessments($userId, $term, $year){
         if($userId && $term && $year){
             return Assessment::select("classroom_id", "subject_id", "name", "type", "score")->where([
@@ -118,6 +195,8 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
 
     public function getClassroomAssessments($classId, $term, $year){
         if($classId && $term && $year){
+            $this->classroomSubjects = Classroom::find($classId)->subjects;
+
             return Assessment::select("user_id", "subject_id", "name", "type", "score")->where([
                 'classroom_id' => $classId,
                 'term' => $term,
@@ -131,7 +210,7 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
 
 
 
-    public function prepareUserResult($assessment){
+    /*public function prepareUserResult($assessment){
 
         
         $assessment = $assessment->groupBy('subject_id');
@@ -165,40 +244,51 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
         });
          
         return $newAssessment->all();
-    }
+    }*/
 
 
 
 
-    public function prepareClassroomResult($assessments){
+    public function prepareClassroomResult( $request, $assessments){
         $assessments = $assessments->groupBy('user_id');
         $newAssessment = $assessments->map(function ($item, $key) {  // All subjects assessments
-            //$key = Subject::find($key)->name;
-            $formattedAssessments = [];
-            $CA = 0;
-            $exams = 0;
-            foreach($item as $ass){ // Single subject assessment
-                //$userId = $ass->user_id;
-                $subject = Subject::find($ass->subject_id)->name;
-                $formattedAssessments[$subject]["subject"] = $subject;
-                $formattedAssessments[$subject]["subjectId"] = $ass->subject_id;
+            
+                $formattedAssessments = [];
+                
+                foreach($item as $ass){ // Single subject assessment
 
-                if($ass->name == "Assignment" || $ass->name == "Test"){
-                    $CA = $CA + $ass->score;
-                    $formattedAssessments[$subject]["ca"] = $CA;  
-                }else if($ass->name == "Exams"){
-                    $exams = $ass->score;
-                    $formattedAssessments[$subject]["exams"] = $ass->score;
-                }  
+                    $CA = 0;
+                    $exams = 0;
 
-                $formattedAssessments[$subject]["total"] = $exams + $CA;
-                $formattedAssessments[$subject]["grade"] = $this->getGrade($exams + $CA);
-            }
+                    //$userId = $ass->user_id;
+                    $subject = Subject::find($ass->subject_id)->name;
+                    $formattedAssessments[$subject]["subject"] = $subject;
+                    $formattedAssessments[$subject]["subjectId"] = $ass->subject_id;
+
+                    if($ass->name == "Assignment" || $ass->name == "Test"){
+                        //$CA = $CA + $ass->score;
+                        if( array_key_exists("ca", $formattedAssessments[$subject]) ){ // Iteration already begins 
+                            $formattedAssessments[$subject]["ca"] = $formattedAssessments[$subject]["ca"] + $ass->score;  
+                            $CA = $formattedAssessments[$subject]["ca"];
+                        } else { // Iteration now begins 
+                            $formattedAssessments[$subject]["ca"] = $ass->score;  
+                            $CA = $formattedAssessments[$subject]["ca"];
+                        }
+
+                    }else if($ass->name == "Exams"){
+                        $exams = $ass->score;
+                        $formattedAssessments[$subject]["exams"] = $exams;
+                    }  
+
+                    $formattedAssessments[$subject]["total"] = $exams + $CA;
+                    $formattedAssessments[$subject]["grade"] = $this->getGrade($exams + $CA);
+                }
 
             return $formattedAssessments;  // Next subject
         });
 
-        return $this->setSubjectStatistics($newAssessment->all());
+        $newAssessment = $this->setAbsentSubjects($request, $newAssessment->all());
+        return $this->setSubjectStatistics($request, $newAssessment);
         //return $newAssessment->all();
     }
 
@@ -220,11 +310,43 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
 
 
 
-    public function setSubjectStatistics($formattedAssessments) {
+    public function setAbsentSubjects($request, $formattedAssessments) {
+        foreach($this->classroomSubjects as $classSubject){ 
+            $userIds = array_keys($formattedAssessments);
+            for($id=0; $id < count( $userIds) ; $id++){
+                if( !array_key_exists($classSubject->name, $formattedAssessments[$userIds[$id]]) ){
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["subject"] = $classSubject->name ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["subjectId"] = $classSubject->id ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["ca"] = "Abs" ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["exam"] = "Abs" ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["total"] = 0 ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["grade"] = "Abs" ;
+                    
+                } else if( !array_key_exists("ca", $formattedAssessments[$userIds[$id]][ $classSubject->name ]) ){
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["ca"] = "Abs" ;
+                } else if( !array_key_exists("exams", $formattedAssessments[$userIds[$id]][ $classSubject->name ]) ){
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["exams"] = "Abs" ;
+                }                    
+            }
+        }
+        return $formattedAssessments;
+    }
+
+
+
+
+    public function setSubjectStatistics($request, $formattedAssessments) {
 
         $allUsersAllSubjectsScores = [];
         $subjectStatistics = [];
         $userSubjects = [];
+        $allUsersAllSubjectsGrandTotal = [];
+        $classAllSubjectsGrandTotal = [];
+
+        $student = User::where("id", $request['id'])->first();
+        $classroomId = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
+        $classroomName = Classroom::find($classroomId)->name;
+
 
        $userIds = array_keys($formattedAssessments);
        for($id=0; $id < count( $userIds) ; $id++){
@@ -234,6 +356,23 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
                 // Each user id with his corresponding all subjects total scores
                 $allUsersAllSubjectsScores[$userIds[$id]][ $userSubjects[$subject] ] = $total;
                 
+                if( array_key_exists($userIds[$id], $allUsersAllSubjectsGrandTotal )){
+                    $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ] 
+                        =  intval($allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ]) + intval($total);
+                    
+                    $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotalAve" ] 
+                        =  ( intval($allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ])/count($this->classroomSubjects) );
+                        
+                    $classAllSubjectsGrandTotal[$id] = $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ];
+
+                } else {
+                    $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ] = $total;
+                    $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotalAve" ] 
+                    =  ( intval($allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ])/count($this->classroomSubjects) );
+                    
+                    $classAllSubjectsGrandTotal[$id] = $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ];
+
+                }
             }
        }
 
@@ -250,7 +389,44 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
                 $formattedAssessments[$userIds[$id]][ $subjectName]["minScoreUserId"] = $subjectStatistics[$subjectName]["minScoreUserId"];
                 $formattedAssessments[$userIds[$id]][ $subjectName]["subjectPosition"] = $subjectStatistics[$userIds[$id]][$subjectName]["subjectPosition"];
             }
+            // Add student result info such as psychomotor_handwriting etc
+            $user_number = User::find($userIds[$id])->user_number;
+            $studentResultInfo = Resultinfo::where("user_number", $user_number)
+                ->where("term", $request["term"])
+                ->where("result_scope", "student")
+                ->where("session", $request["year"])->get();
+
+            // Add school result info such as resumption date
+            $schoolResultInfo = Resultinfo::where("user_number", $user_number)
+                ->where("term", $request["term"])
+                ->where("result_scope", "school")
+                ->where("session", $request["year"])->get();    
+
+            $formattedAssessments[$userIds[$id]][ "studentResultInfo" ] = $studentResultInfo ;
+            $formattedAssessments[$userIds[$id]][ "schoolResultInfo" ] = $schoolResultInfo ;
+            $formattedAssessments[$userIds[$id]][ "grandTotal" ] = $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ];
+            $formattedAssessments[$userIds[$id]][ "grandTotalAve" ] = round($allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotalAve" ], 2);
+            
+            // getSubjectPosition($allSubjectScores, $subjectScore);
+            $formattedAssessments[$userIds[$id]][ "classPosition" ] 
+                = $this->getSubjectPosition($classAllSubjectsGrandTotal, $formattedAssessments[$userIds[$id]][ "grandTotal" ]);
+            $formattedAssessments[$userIds[$id]][ "classPositionGrade" ]
+                = $this->getGrade($formattedAssessments[$userIds[$id]][ "classPosition" ]);
+
+            $formattedAssessments[$userIds[$id]][ "classNoOfStudents" ] = count($userIds); 
+            $formattedAssessments[$userIds[$id]][ "classroomName" ] = $classroomName; 
+
+            $formattedAssessments[$userIds[$id]][ "studentFullName" ] = $student->name; 
+            $formattedAssessments[$userIds[$id]][ "studentRegNo" ] = $student->user_number; 
+
+            $classroomId = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
+            $classroomSubjects = Classroom::find($classroomId)->subjects;
+            $formattedAssessments[$userIds[$id]][ "classroomSubjects" ] = $classroomSubjects;
+
+            $formattedAssessments[$userIds[$id]][ "xxx" ] = $this->classroomSubjects;
+
         }
+
         return $formattedAssessments;
     }
 
@@ -271,14 +447,17 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
                 if(empty($subjectStatistics[$subjectName]["min"]))
                     $subjectStatistics[$subjectName]["min"] = 1000; // Seed highest to find the min val
                 
-
+                // User subject position
                 $subjectScores = array_filter(array_column($allUsersAllSubjectsScores, $subjectName));
                 $subjectStatistics[$userIds[$id]][$subjectName]["subjectPosition"] = $this->getSubjectPosition($subjectScores, $subjectScore);
 
+                // Subject average position
                 if(empty($subjectStatistics[$subjectName]["ave"])){
-                    $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);
+                    if(count($subjectScores) > 0)
+                        $subjectStatistics[$subjectName]["ave"] = array_sum($subjectScores)/count($subjectScores);
+                    else
+                        $subjectStatistics[$subjectName]["ave"] = 0;
                 }
-
 
                 // User with max score
                 if($subjectScore > $subjectStatistics[$subjectName]["max"] ){
@@ -286,6 +465,7 @@ return $this->sendResponse($preparedClassroomResult[$request['id']], 'Result lis
                     $subjectStatistics[$subjectName]["maxScoreUserId"] = $userIds[$id];                
                 } 
                 
+                // User with min score
                 if($subjectScore < $subjectStatistics[$subjectName]["min"] ){
                     $subjectStatistics[$subjectName]["min"] = $subjectScore; 
                     $subjectStatistics[$subjectName]["minScoreUserId"] = $userIds[$id];                

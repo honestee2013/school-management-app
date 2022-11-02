@@ -4,6 +4,7 @@ namespace App\Models\Honestee\VueCodeGen;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 use App\Models\Honestee\VueCodeGen\User;
+use App\Models\Honestee\VueCodeGen\Subject;
 
 
 class Classroom extends Model
@@ -43,6 +44,13 @@ class Classroom extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
+
+
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class)->withTimestamps();
     }
 
  

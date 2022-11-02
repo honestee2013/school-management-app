@@ -16,7 +16,7 @@ use DB;
 use Str;
 
 
-class ClassroomUserController extends Controller
+class ClassroomResultController extends Controller
 {
     /**
      * Create a new controller instance.
@@ -40,6 +40,11 @@ class ClassroomUserController extends Controller
         }
         $this->authorize('isAdmin');
 
+
+        return $this->sendResponse($request, 'Result info ');
+
+
+
         if(Str::plural($request->query('all', ''))){
             $result = ClassroomUser::all();
             return $this->sendResponse($result, 'classroom_user list ');
@@ -47,7 +52,7 @@ class ClassroomUserController extends Controller
 
 
 
-        $page = $request->query('page', 1);
+        /*$page = $request->query('page', 1);
         $perPage = $request->query('perPage', '5');
         $sortType = $request->query('sortType', 'asc');
         $sortField = $request->query('sortField');
@@ -73,7 +78,7 @@ class ClassroomUserController extends Controller
         else       
             $classroom_user = $query->paginate( $perPage );
   
-        return $this->sendResponse($classroom_user, 'classroom_user list ');
+        return $this->sendResponse($classroom_user, 'classroom_user list ');*/
     }
 
 

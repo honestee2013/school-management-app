@@ -62,3 +62,5 @@ Route::apiResources([ 'student-result' => 'App\Http\Controllers\Honestee\VueCode
 
 Route::apiResources([ 'classroom-users' => 'App\Http\Controllers\Honestee\VueCodeGen\ClassroomUserController' ]);
 Route::apiResources([ 'user-classrooms' => 'App\Http\Controllers\Honestee\VueCodeGen\ClassroomUserController' ]);
+Route::apiResources([ 'classroom-subjects' => 'App\Http\Controllers\Honestee\VueCodeGen\ClassroomSubjectController' ]);
+Route::apiResources([ 'subject-classrooms' => 'App\Http\Controllers\Honestee\VueCodeGen\ClassroomSubjectController' ]);

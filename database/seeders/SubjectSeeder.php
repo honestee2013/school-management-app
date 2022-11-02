@@ -213,13 +213,13 @@ class SubjectSeeder extends Seeder
 
 
         //$subjects = array_unique(array_merge_recursive($NURSERY, $PRIMARY, $JSS, $WAEC));
-        $subjects = array_unique(array_merge_recursive($NURSERY, $PRIMARY, $JSS, $WAEC));
+        /*$subjects = array_unique(array_merge_recursive($NURSERY, $PRIMARY, $JSS, $WAEC));
 
         foreach($subjects as $subject){
             DB::table('subjects')->insert([
                 'name' => $subject,
             ]);
-        }
+        }*/
         
     }
 }
