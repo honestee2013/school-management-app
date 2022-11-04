@@ -18,7 +18,6 @@ use Str;
 
 class ClassroomController extends Controller
 {
-    
     /**
      * Create a new controller instance.
      *
@@ -41,20 +40,13 @@ class ClassroomController extends Controller
         }
         $this->authorize('isAdmin');
 
-
-
-        if($request['q'] && $request['id']){
-            $classroom = Classroom::findOrFail($request['id']);
-            $users = null;
-            if($classroom)
-                $users = $classroom->users()->get();
-
-            //$result = User::all();
-            return $this->sendResponse($users, 'Users list ');
-
-        }else if(Str::plural($request->query('all', ''))){
+        if($request['id'] == "all"){
             $result = Classroom::all();
             return $this->sendResponse($result, 'Classrooms list ');
+
+        }else if($request['id']){
+            $result = Classroom::findOrFail($request['id']);
+            return $this->sendResponse($result, 'Classrooms ');
         }
 
 
@@ -141,18 +133,11 @@ class ClassroomController extends Controller
         $relation = Str::plural($request->query('tbl', ''));
 
         if($model_id && $relation &&  $pv_ids){ // Many to Many relationships
-            $query = $model::find($model_id)->{$relation}()->sync( explode(",", $pv_ids) )->withTimestamps();
+            $query = $model::find($model_id)->{$relation}()->sync( explode(",", $pv_ids) );
             return $this->sendResponse($query, ucfirst($relation)." were attached to the ".ucfirst($request->query('pv_tbl', '')." Successfully"));
         } else {
             $this->checkValidation($request);
-            $classroom = Classroom::insert(
-                [
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                    'section_id' => $request["section_id"],
-                    'name' => $request["name"],
-                ]
-            );//create($request->all());    
+            $classroom = Classroom::create($request->all());    
             return $this->sendResponse( $classroom, 'Classroom Created Successfully');
         }
 

@@ -17,6 +17,9 @@ class CreateClassroomsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('section_id')->unsigned();
             $table->string('name');
+
+            $table->string('form_master');
+            
             $table->timestamps();
 
             $table->foreign('section_id')->references('id')->on('sections')->onDelete('cascade');

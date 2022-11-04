@@ -577,7 +577,7 @@ export default {
 
       assessments: [],
       sections: [],
-      classrooms: [],
+      //classrooms: [],
       users: [],
       subjects: [],
 
@@ -1103,25 +1103,30 @@ export default {
           var url = "api/users?userNumber="+this.userNumber;
           axios.get(url).then(user => {
             if (user.data.data) {
-              //console.log(user.data.data);
+              console.log(user.data.data);
               this.user = user.data.data;
 
 
               url = "api/users?q=classroom&id="+this.user.id;
                 axios.get(url).then(classrooms => {
+
                   if (classrooms.data.data) {
-                    //console.log(classrooms.data.data.reverse());
-                    this.classrooms = classrooms.data.data.reverse();
+                      //console.log(classrooms.data.data.reverse());
+                      this.classrooms = classrooms.data.data.reverse();
+
+                      // Query the all the users in classrooms
+                      url = "api/classrooms?q=users&id="+this.classrooms[0].id;
+                      axios.get(url).then(users => {
+                        if (users.data.data) {
+                          //console.log(users.data.data.reverse());
+                          this.users = users.data.data;
+                        }
+                      });
                   }
+                  
               });
 
-              url = "api/classrooms?q=users&id="+this.classrooms[0].id;
-                axios.get(url).then(users => {
-                  if (users.data.data) {
-                    //console.log(users.data.data.reverse());
-                    this.users = users.data.data;
-                  }
-              });
+
 
 
               url = "api/assessments?id="+this.user.id+"&term="+ this.resultTerm+"&year="+ this.resultYear;

@@ -238,6 +238,12 @@
                 <has-error :form="form" field="name"></has-error>
               </div>
               <div class="form-group">
+                <label>Form master</label>
+                <input type="text" v-model="form.form_master" name="form_master" class="form-control"
+                  :class="{ 'is-invalid': form.errors.has('form_master') }" maxlength="125">
+                <has-error :form="form" field="form_master"></has-error>
+              </div>
+              <div class="form-group">
 
                 <input type="hidden" v-model="form.created_at"></input>
 
