@@ -14,6 +14,7 @@ use App\Models\Honestee\VueCodeGen\Assessment;
 use App\Models\Honestee\VueCodeGen\Subject;
 use App\Models\Honestee\VueCodeGen\Classroom;
 use App\Models\Honestee\VueCodeGen\User;
+use App\Models\Honestee\VueCodeGen\School;
 
 
 use DB;
@@ -51,7 +52,7 @@ class AssessmentController extends Controller
         $this->authorize('isAdmin');
 
         if($request['resultinfo'] == 'get' )
-            return $this->getResultinfo($request);
+            return $this->sendResponse($this->getResultinfo($request), "Result information");
         else if($request['resultinfo'] == 'set' )
             return $this->setResultinfo($request);
 
@@ -119,17 +120,32 @@ class AssessmentController extends Controller
     }
 
 
+
+    public function getResultInfo(Request $request){
+        $query = Resultinfo::where('session', $request['year'])
+            ->where('term', $request['term'])
+            ->where('result_scope', $request['result_scope']);
+
+        if($request['result_scope'] == "Student")
+            return $query->where('user_number', $request['user_number'])->get();
+        else
+            return $query->get();
+    
+    }
+
+
+
     public function setResultInfo(Request $request){
 
         $resultInfo = Resultinfo::firstOrNew( 
             array(
                 'session' => $request['session'],
                 'term' => $request['term'],
-                'user_number' => $request['user_number']
+                'result_scope' => $request['result_scope'],
             ) 
         );
         
-        $resultInfo->result_scope = 'student';
+        
         $resultInfo->user_number = $request['user_number'];
         $resultInfo->owner = $request['user_id'];
 
@@ -165,8 +181,11 @@ class AssessmentController extends Controller
         $resultInfo->section_id = 0;
         $resultInfo->next_term_begins_on = '0';
 
+        $resultInfo->hold_result = filter_var($request['hold_result'], FILTER_VALIDATE_BOOLEAN);
+        $resultInfo->reason_for_holding_result = $request['reason_for_holding_result'];
 
         $resultInfo->session = $request['session'];
+        $resultInfo->next_term_begins_on = $request['next_term_begins_on'];
         $resultInfo->term = $request['term'];
         $resultInfo->save();
 
@@ -314,18 +333,23 @@ class AssessmentController extends Controller
         foreach($this->classroomSubjects as $classSubject){ 
             $userIds = array_keys($formattedAssessments);
             for($id=0; $id < count( $userIds) ; $id++){
-                if( !array_key_exists($classSubject->name, $formattedAssessments[$userIds[$id]]) ){
+                if( !array_key_exists($classSubject->name, $formattedAssessments[$userIds[$id]]) ){ 
+                    // Not found in the student attended subjects
                     $formattedAssessments[$userIds[$id]][ $classSubject->name ]["subject"] = $classSubject->name ;
                     $formattedAssessments[$userIds[$id]][ $classSubject->name ]["subjectId"] = $classSubject->id ;
-                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["ca"] = "Abs" ;
-                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["exam"] = "Abs" ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["ca"] = "-" ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["exam"] = "-" ;
                     $formattedAssessments[$userIds[$id]][ $classSubject->name ]["total"] = 0 ;
-                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["grade"] = "Abs" ;
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["grade"] = "-" ;
                     
-                } else if( !array_key_exists("ca", $formattedAssessments[$userIds[$id]][ $classSubject->name ]) ){
-                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["ca"] = "Abs" ;
-                } else if( !array_key_exists("exams", $formattedAssessments[$userIds[$id]][ $classSubject->name ]) ){
-                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["exams"] = "Abs" ;
+                }
+                
+                if( !array_key_exists("ca", $formattedAssessments[$userIds[$id]][ $classSubject->name ]) ){
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["ca"] = "-" ;
+                }
+                
+                if( !array_key_exists("exams", $formattedAssessments[$userIds[$id]][ $classSubject->name ]) ){
+                    $formattedAssessments[$userIds[$id]][ $classSubject->name ]["exams"] = "-" ;
                 }                    
             }
         }
@@ -397,15 +421,29 @@ class AssessmentController extends Controller
                 ->where("session", $request["year"])->get();
 
             // Add school result info such as resumption date
-            $schoolResultInfo = Resultinfo::where("user_number", $user_number)
-                ->where("term", $request["term"])
+            $schoolResultInfo = Resultinfo::where("term", $request["term"])
                 ->where("result_scope", "school")
-                ->where("session", $request["year"])->get();    
+                ->where("session", $request["year"])->first();    
 
             $formattedAssessments[$userIds[$id]][ "studentResultInfo" ] = $studentResultInfo ;
             $formattedAssessments[$userIds[$id]][ "schoolResultInfo" ] = $schoolResultInfo ;
             $formattedAssessments[$userIds[$id]][ "grandTotal" ] = $allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotal" ];
             $formattedAssessments[$userIds[$id]][ "grandTotalAve" ] = round($allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotalAve" ], 2);
+            $formattedAssessments[$userIds[$id]][ "grandTotalGrade" ] = $this->getGrade($allUsersAllSubjectsGrandTotal[$userIds[$id]][ "grandTotalAve" ]);
+            
+            //$formattedAssessments[$userIds[$id]][ "xxxjjj" ] = app('currentTenant');
+            $schoolInfo = School::latest()->first();
+            $formattedAssessments[$userIds[$id]][ "schoolName" ] = $schoolInfo->name;
+            $formattedAssessments[$userIds[$id]][ "schoolAddress" ] = $schoolInfo->address;
+            $formattedAssessments[$userIds[$id]][ "schoolPhone" ] = $schoolInfo->phone_no_1.", ".$schoolInfo->phone_no_2;
+            $formattedAssessments[$userIds[$id]][ "schoolEmail" ] = $schoolInfo->email_1.", ".$schoolInfo->email_2;
+            
+
+            $formattedAssessments[$userIds[$id]][ "schoolResumptionDate" ] = $schoolResultInfo->next_term_begins_on;
+            $formattedAssessments[$userIds[$id]][ "classFormMaster" ] = $this->getNameInitials(User::where("id", $userIds[$id] )->first()
+                ->currentClassroom()->first()->form_master);
+
+            User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
             
             // getSubjectPosition($allSubjectScores, $subjectScore);
             $formattedAssessments[$userIds[$id]][ "classPosition" ] 
@@ -429,6 +467,14 @@ class AssessmentController extends Controller
         }
 
         return $formattedAssessments;
+    }
+
+
+    public function getNameInitials($str) {
+        $ret = '';
+        foreach (explode(' ', $str) as $word)
+            $ret .= strtoupper($word[0]);
+        return $ret;
     }
 
 

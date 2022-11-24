@@ -16,8 +16,8 @@ class CreateResultinfoTable extends Migration
         Schema::create('resultinfos', function (Blueprint $table) {
             $table->id();
 
+            $table->string('user_number')->nullable(); // Student number
             $table->string("result_scope")->default("school"); // School, Classroom, Student
-            $table->string('user_number')->defaults(""); // Student number
             $table->string("session");
             $table->string("term");
 
@@ -29,42 +29,42 @@ class CreateResultinfoTable extends Migration
             $table->bigInteger('owner')->unsigned(); // User_id, classroom_id, school_id
 
             //SCHOOL-FEES:
-            $table->integer("debt")->defaults(0);
-            $table->integer("next_term_school_fees")->defaults(0);
+            $table->integer("debt")->default(0);
+            $table->integer("next_term_school_fees")->default(0);
 
             //COMMENTS: 
-            $table->text("form_master_comment")->defaults("");
-            $table->text("principal_comment")->defaults("");
+            $table->text("form_master_comment")->nullable();
+            $table->text("principal_comment")->nullable();
 
             //MESSAGES: 
-            $table->text("message_to_parent")->defaults("");
-            $table->text("message_to_student")->defaults("");
-            $table->text("message_to_staff")->defaults("");
+            $table->text("message_to_parent")->nullable();
+            $table->text("message_to_student")->nullable();
+            $table->text("message_to_staff")->nullable();
 
             //EFFECTIVE-SKILLS: 
-            $table->tinyInteger("effective_punctuality")->defaults(3);
-            $table->tinyInteger("effective_politeness")->defaults(3);
-            $table->tinyInteger("effective_neatness")->defaults(3);
-            $table->tinyInteger("effective_honesty")->defaults(3);
-            $table->tinyInteger("effective_leadership_skill")->defaults(3);
-            $table->tinyInteger("effective_cooperation")->defaults(3);
-            $table->tinyInteger("effective_attentiveness")->defaults(3);
-            $table->tinyInteger("effective_perseverance")->defaults(3);
-            $table->tinyInteger("effective_attitude_to_work")->defaults(3);
+            $table->tinyInteger("effective_punctuality")->default(3);
+            $table->tinyInteger("effective_politeness")->default(3);
+            $table->tinyInteger("effective_neatness")->default(3);
+            $table->tinyInteger("effective_honesty")->default(3);
+            $table->tinyInteger("effective_leadership_skill")->default(3);
+            $table->tinyInteger("effective_cooperation")->default(3);
+            $table->tinyInteger("effective_attentiveness")->default(3);
+            $table->tinyInteger("effective_perseverance")->default(3);
+            $table->tinyInteger("effective_attitude_to_work")->default(3);
             	
             //PSYCHOMOTOR-SKILLS: 
-            $table->tinyInteger("psychomotor_handwriting")->defaults(3);
-            $table->tinyInteger("psychomotor_verbal_fluency")->defaults(3);
-            $table->tinyInteger("psychomotor_sport")->defaults(3);
-            $table->tinyInteger("psychomotor_handling_tools")->defaults(3);
-            $table->tinyInteger("psychomotor_drawing_and_painting")->defaults(3);
-            $table->tinyInteger("psychomotor_cooperation")->defaults(3);
-            $table->tinyInteger("psychomotor_attentiveness")->defaults(3);
-            $table->tinyInteger("psychomotor_perseverance")->defaults(3);;
-            $table->tinyInteger("psychomotor_attitude_to_work")->defaults(3);
+            $table->tinyInteger("psychomotor_handwriting")->default(3);
+            $table->tinyInteger("psychomotor_verbal_fluency")->default(3);
+            $table->tinyInteger("psychomotor_sport")->default(3);
+            $table->tinyInteger("psychomotor_handling_tools")->default(3);
+            $table->tinyInteger("psychomotor_drawing_and_painting")->default(3);
+            $table->tinyInteger("psychomotor_cooperation")->default(3);
+            $table->tinyInteger("psychomotor_attentiveness")->default(3);
+            $table->tinyInteger("psychomotor_perseverance")->default(3);;
+            $table->tinyInteger("psychomotor_attitude_to_work")->default(3);
 
 
-            $table->string("next_term_begins_on")->defaults("");
+            $table->string("next_term_begins_on")->nullable();
 
             $table->timestamps();
         });

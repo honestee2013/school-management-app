@@ -244,31 +244,31 @@
               <div class="form-group">
                 <label>School Section</label>
                 <select v-model="form.section_id" name="section_id" class="form-control"
-                  :class="{ 'is-invalid': form.errors.has( 'section_id' ) }">
+                  :class="{ 'is-invalid': form.errors.has( 'section_id' ) }" @change="loadNextField($event, 'classrooms')" >
                   <option v-for="(item, index)  in sections" :key="index" :value="item.id"> {{item.name}} </option>
                 </select>
                 <has-error :form="form" field="section_id"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="classrooms.length">
                 <label>Classroom</label>
                 <select v-model="form.classroom_id" name="classroom_id" class="form-control"
-                  :class="{ 'is-invalid': form.errors.has( 'classroom_id' ) }">
+                  :class="{ 'is-invalid': form.errors.has( 'classroom_id' ) }" @change="loadNextField($event, 'users')">
                   <option v-for="(item, index)  in classrooms" :key="index" :value="item.id"> {{item.name}} </option>
                 </select>
                 <has-error :form="form" field="classroom_id"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="users.length">
                 <label>Student</label>
                 <select v-model="form.user_id" name="user_id" class="form-control"
-                  :class="{ 'is-invalid': form.errors.has( 'user_id' ) }">
+                  :class="{ 'is-invalid': form.errors.has( 'user_id' ) }" @change="loadNextField($event, 'subjects')">
                   <option v-for="(item, index)  in users" :key="index" :value="item.id"> {{item.name}} </option>
                 </select>
                 <has-error :form="form" field="user_id"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="subjects.length">
                 <label>Subject</label>
                 <select v-model="form.subject_id" name="subject_id" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'subject_id' ) }">
@@ -277,7 +277,7 @@
                 <has-error :form="form" field="subject_id"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="subjects.length">
                 <label>Name</label>
                 <select v-model="form.name" name="name" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'name' ) }">
@@ -288,7 +288,7 @@
                 <has-error :form="form" field="name"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="subjects.length">
                 <label>Session</label>
                 <select v-model="form.year" name="year" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'year' ) }">
@@ -301,7 +301,7 @@
                 <has-error :form="form" field="year"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="subjects.length">
                 <label>Term</label>
                 <select v-model="form.term" name="term" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'term' ) }">
@@ -312,7 +312,7 @@
                 <has-error :form="form" field="term"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="subjects.length">
                 <label>Type</label>
                 <select v-model="form.type" name="type" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'type' ) }">
@@ -323,7 +323,7 @@
                 <has-error :form="form" field="type"></has-error>
 
               </div>
-              <div class="form-group">
+              <div class="form-group" v-show="subjects.length">
                 <label>Score</label>
                 <input type="number" v-model="form.score" class="form-control"
                   :class="{ 'is-invalid': form.errors.has( 'score' ) }"></input>
@@ -888,30 +888,72 @@ export default {
     },
 
 
+    loadNextField(event, theField){
+        //console.log(event.target.value)
+        var url = "api/";
+
+        if(theField == "classrooms")
+          url = url + "classrooms?sectionId=" + event.target.value;
+        else if(theField == "users")
+          url = url + "users?classroomId=" + event.target.value;
+        else if(theField == "subjects")
+          url = url + "subjects?userId=" + event.target.value;
+        
+
+        try {
+          axios.get(url).then(response => {
+            if (response.data.data) {
+              if(theField == "classrooms")
+                this.classrooms = response.data.data.data;
+              else if(theField == "users")
+                this.users = response.data.data.data;
+              else if(theField == "subjects")
+                this.subjects = response.data.data.data;
+
+                //alert(JSON.stringify( this.classrooms) );
+            }
+          });
+        } catch (error) {
+          console.log(error.message);
+        };
+
+    },
+
+    
+
+
 
 
   },
 
 
   mounted() {
+    this.loadAssessments();
+    this.loadSections();
+
     //console.log('Assessment Component mounted.')
+    /*this.$Progress.start();
+    //this.loadAssessments();
+    this.loadSections();
+    this.loadClassrooms();
+    this.loadUsers();
+    this.loadSubjects();
+    this.$Progress.finish();*/
+
+  },
+
+
+  /*created() {
+    this.$Progress.start();
     this.$Progress.start();
     this.loadAssessments();
     this.loadSections();
     this.loadClassrooms();
     this.loadUsers();
-    this.loadSubjects();
+    this.loadSubjects();;
     this.$Progress.finish();
 
-  },
-
-
-  created() {
-    this.$Progress.start();
-    this.loadAssessments();
-    this.$Progress.finish();
-
-  },
+  },*/
 
 
   computed: {},

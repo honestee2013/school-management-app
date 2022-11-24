@@ -21,6 +21,9 @@ class CreateSchoolsTable extends Migration
             $table->string("phone_no_2");
             $table->string("email_1");
             $table->string("email_2");
+            $table->string("school_batch")->nullable();
+            $table->string("school_stamp")->nullable();
+            $table->string("school_url")->nullable();
             $table->timestamps();
         });
     }

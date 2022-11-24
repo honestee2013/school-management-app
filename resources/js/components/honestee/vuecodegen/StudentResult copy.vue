@@ -85,7 +85,19 @@
 
 <nav class="navbar navbar-light bg-light">
       <form class="form-inline pt-3 pt-sm-0"  @submit.prevent="editResultMode ? editResult() : showResult()">
-        <input  v-model="userNumber" type="text" class="form-control" required = "required" placeholder="User Number">
+        
+        <select v-model="resultScope" class="custom-select m-sm-2 my-2" required = "required" v-on:change="changeResultScope($event)">
+            <option selected>Result Scope</option>
+            <option value="student">Student</option>
+            <option value="school">School</option>
+            <!--<option value="class">Class</option>-->
+
+        </select>
+        xxxxxxxxxx {{resultYear}} xxxx
+
+        
+        
+        <input v-if="(resultScope)"  v-model="userNumber" type="text" class="form-control" required = "required" placeholder="User Number">
         
         <select v-model="resultYear" class="custom-select m-sm-2 my-2" required = "required" >
             <option selected>Select Session</option>
@@ -143,7 +155,11 @@
               <table border="2" style="width:100%">
                 <tr style=""><th class="">Session:</th><td>2022/2023</td></tr>
                 <tr style=""><th class="">Term:</th><td>First</td></tr>
-                <tr style=""><th class="">Resumption Date:</th><td>2022/2023</td></tr>
+                <tr style=""><th class="">Resumption Date:</th>
+                  <td>
+                    <input type="date" style="width:100%" v-model="next_term_begins_on" v-if="editResultMode"></input> <span v-if="!editResultMode">{{next_term_begins_on}}</span>
+                  </td>
+                </tr>
               </table>
             </div>
             <div class="mx-1" style="width:32.3%">
@@ -550,8 +566,11 @@ export default {
       message_to_student: "NIL",
       message_to_staff: "NIL",
 
+      next_term_begins_on: "",
+
       classroomSubjects: [], 
       studentAssessmentSubjects: [],
+      resultScope: "",
 
 
 
@@ -980,6 +999,19 @@ export default {
         axios.get(url).then(sections => {
           if (sections.data.data) {
             this.sections = sections.data.data;
+
+            try {
+              var url = "api/classrooms?all=all";
+              axios.get(url).then(classrooms => {
+                if (classrooms.data.data) {
+                  this.classrooms = classrooms.data.data;
+                }
+              });
+            } catch (error) {
+              console.log(error.message);
+            };
+
+            
           }
         });
       } catch (error) {
@@ -1126,11 +1158,11 @@ export default {
 
               url = "api/assessments?id="+this.user.id+"&term="+ this.resultTerm+"&year="+ this.resultYear;
               axios.get(url).then(assessments => {
-                if (assessments.data.data) {
+                /*if (assessments.data.data) {
                   //console.log(assessments.data.data);
                   this.studentAssessments = assessments.data.data;
-                  ///this.studentAssessmentSubjects = assessments.data.data.keys();
-                  ///console.log(assessments.data.data.keys());
+                  //this.studentAssessmentSubjects = assessments.data.data.keys();
+                  //console.log(assessments.data.data.keys());
 
                   
 
@@ -1138,8 +1170,9 @@ export default {
                   if(assessments.data.data.classroomSubjects)
                     this.classroomSubjects = assessments.data.data.classroomSubjects;
 
-                  //alert(JSON.stringify(assessments.data.data.studentResultInfo[0].effective_punctuality));
-                  if(assessments.data.data.studentResultInfo){
+                  //alert(JSON.stringify(assessments.data.data.studentResultInfo.length));
+
+                  if(assessments.data.data.studentResultInfo.length){
                     this.effective_punctuality = assessments.data.data.studentResultInfo[0].effective_punctuality;
                     this.effective_politeness = assessments.data.data.studentResultInfo[0].effective_politeness;
                     this.effective_neatness = assessments.data.data.studentResultInfo[0].effective_neatness;
@@ -1166,9 +1199,11 @@ export default {
                     this.message_to_parent = assessments.data.data.studentResultInfo[0].message_to_parent;
                     this.message_to_student = assessments.data.data.studentResultInfo[0].message_to_student;
                     this.message_to_staff = assessments.data.data.studentResultInfo[0].message_to_staff;
+
+                    this.next_term_begins_on = assessments.data.data.studentResultInfo[0].next_term_begins_on;
                   }
 
-                }
+                }*/
               });
               
             } else {
@@ -1193,6 +1228,13 @@ export default {
 
 
 
+    },
+
+
+    changeResultScope(event) {
+      console.log(event.target.value);
+      this.resultScope = event.target.value;
+
     }
 
 
@@ -1215,7 +1257,7 @@ export default {
 
   created() {
     this.$Progress.start();
-    this.loadAssessments();
+    // this.loadAssessments();
     this.$Progress.finish();
   },
 

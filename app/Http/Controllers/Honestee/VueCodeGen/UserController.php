@@ -58,8 +58,8 @@ class UserController extends Controller
             $result = User::findOrFail($request['id']);
             return $this->sendResponse($result, 'Users ');
 
-        }else if($request['userNumber']){
-            $result = User::where("user_number", $request['userNumber'])->first();
+        }else if($request['user_number']){
+            $result = User::where("user_number", $request['user_number'])->first();
             return $this->sendResponse($result, 'User ');
         }
 

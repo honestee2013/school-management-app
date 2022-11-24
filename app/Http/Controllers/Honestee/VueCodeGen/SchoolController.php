@@ -133,7 +133,9 @@ class SchoolController extends Controller
             return $this->sendResponse($query, ucfirst($relation)." were attached to the ".ucfirst($request->query('pv_tbl', '')." Successfully"));
         } else {
             $this->checkValidation($request);
-            $school = School::create($request->all());    
+            $school = School::create($request->all());   
+            $school->addMedia($request['schoolBatch'])->toMediaCollection('main-theme');  
+            $school->addMedia($request['schoolStamp'])->toMediaCollection('main-theme');  
             return $this->sendResponse( $school, 'School Created Successfully');
         }
 
@@ -194,7 +196,7 @@ class SchoolController extends Controller
         $school = School::findOrFail($id);
         $input = $request->all();
         $school->fill($input)->save();
-        return $this->sendResponse($school, 'School Information has been updated');
+        return $this->sendResponse($request, 'School Information has been updated');
     }
 
     /**
