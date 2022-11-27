@@ -437,9 +437,22 @@ class AssessmentController extends Controller
             $formattedAssessments[$userIds[$id]][ "schoolAddress" ] = $schoolInfo->address;
             $formattedAssessments[$userIds[$id]][ "schoolPhone" ] = $schoolInfo->phone_no_1.", ".$schoolInfo->phone_no_2;
             $formattedAssessments[$userIds[$id]][ "schoolEmail" ] = $schoolInfo->email_1.", ".$schoolInfo->email_2;
-            
 
-            $formattedAssessments[$userIds[$id]][ "schoolResumptionDate" ] = $schoolResultInfo->next_term_begins_on;
+            $schoolImages = $schoolInfo->getMedia("school-images");
+            for($i=0; $i < count($schoolImages); $i++){
+                if($schoolImages[$i]->name == "schoolBatch"){
+                    $formattedAssessments[$userIds[$id]][ "schoolBatch" ] = $schoolImages[$i]->getUrl();
+                    $formattedAssessments[$userIds[$id]][ "schoolBatch"] = str_replace("localhost", "localhost:8000", $formattedAssessments[$userIds[$id]][ "schoolBatch"]);
+                }
+                if($schoolImages[$i]->name == "schoolStamp"){
+                    $formattedAssessments[$userIds[$id]][ "schoolStamp" ] = $schoolImages[$i]->getUrl();
+                    $formattedAssessments[$userIds[$id]][ "schoolStamp"] = str_replace("localhost", "localhost:8000", $formattedAssessments[$userIds[$id]][ "schoolStamp"]);
+                }
+            }
+
+            if($schoolResultInfo)
+                $formattedAssessments[$userIds[$id]][ "schoolResumptionDate" ] = $schoolResultInfo->next_term_begins_on;
+
             $formattedAssessments[$userIds[$id]][ "classFormMaster" ] = $this->getNameInitials(User::where("id", $userIds[$id] )->first()
                 ->currentClassroom()->first()->form_master);
 

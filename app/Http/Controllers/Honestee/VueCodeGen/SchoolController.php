@@ -128,14 +128,41 @@ class SchoolController extends Controller
         $pv_ids = $request->query('pv_ids', '');
         $relation = Str::plural($request->query('tbl', ''));
 
-        if($model_id && $relation &&  $pv_ids){ // Many to Many relationships
+         if(!empty($request["id"])){  // Update
+            $school = School::findOrFail($request["id"]);
+            $school->update($request->all());
+
+
+
+            $schoolImages = $school->getMedia("school-images");
+            for($i=0; $i < count($schoolImages); $i++){
+                
+                if($schoolImages[$i]->name == "schoolBatch" && !empty($request['schoolBatch'])){
+                    $schoolImages[$i]->delete();
+                    $school->addMedia($request['schoolBatch'])->usingName('schoolBatch')->toMediaCollection('school-images');
+                }
+
+                if($schoolImages[$i]->name == "schoolStamp" && !empty($request['schoolStamp'])){
+                    $schoolImages[$i]->delete();
+                    $school->addMedia($request['schoolStamp'])->usingName('schoolStamp')->toMediaCollection('school-images');
+                }
+               
+            }
+
+
+            return $this->sendResponse( $school, 'School Updated Successfully');
+
+         } else if($model_id && $relation &&  $pv_ids){ // Many to Many relationships
             $query = $model::find($model_id)->{$relation}()->sync( explode(",", $pv_ids) );
             return $this->sendResponse($query, ucfirst($relation)." were attached to the ".ucfirst($request->query('pv_tbl', '')." Successfully"));
+
         } else {
             $this->checkValidation($request);
-            $school = School::create($request->all());   
-            $school->addMedia($request['schoolBatch'])->toMediaCollection('main-theme');  
-            $school->addMedia($request['schoolStamp'])->toMediaCollection('main-theme');  
+            $school = School::create($request->all()); 
+            if(!empty($request['schoolBatch']))  
+                $school->addMedia($request['schoolBatch'])->usingName('schoolBatch')->toMediaCollection('school-images');
+            if(!empty(['schoolStamp']))  
+                $school->addMedia($request['schoolStamp'])->usingName('schoolStamp')->toMediaCollection('school-images');  
             return $this->sendResponse( $school, 'School Created Successfully');
         }
 
@@ -192,11 +219,48 @@ class SchoolController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->checkValidation($request);
-        $school = School::findOrFail($id);
-        $input = $request->all();
-        $school->fill($input)->save();
-        return $this->sendResponse($request, 'School Information has been updated');
+        /*$this->checkValidation($request);
+        //$school = School::findOrFail($id)->get()->update($request->all());
+
+        $school = School::where("id", $id);
+
+
+        $school->name = $request["name"];
+        $school->address = $request["address"];
+        $school->phone_no_1 = $request["phone_no_1"];
+        $school->phone_no_2 = $request["phone_no_2"];
+        $school->email_1 = $request["email_1"];
+        $school->email_2 = $request["email_2"];
+
+        //$school->fill($request->all());
+        $school->save();*/
+
+        /*if(!empty($request['schoolBatch']))  
+            $school->addMedia($request['schoolBatch'])->usingName('schoolBatch')->toMediaCollection('school-images');
+        if(!empty(['schoolStamp']))  
+            $school->addMedia($request['schoolStamp'])->usingName('schoolStamp')->toMediaCollection('school-images'); */
+            
+            
+
+            /*$schoolImages = $school->getMedia("school-images");
+            for($i=0; $i < count($schoolImages); $i++){
+                
+                if($schoolImages[$i]->name == "schoolBatch" && !empty($request['schoolBatch'])){
+                    $schoolImages[$i]->delete();
+                    $school->addMedia($request['schoolBatch'])->usingName('schoolBatch')->toMediaCollection('school-images');
+                }
+
+                if($schoolImages[$i]->name == "schoolStamp" && !empty($request['schoolStamp'])){
+                    $schoolImages[$i]->delete();
+                    $school->addMedia($request['schoolStamp'])->usingName('schoolStamp')->toMediaCollection('school-images');
+                }
+               
+            }*/
+
+
+
+
+        //return $this->sendResponse($request, 'School Information has been updated');
     }
 
     /**

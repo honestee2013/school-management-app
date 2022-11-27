@@ -191,7 +191,7 @@
         <div class="row my-3" id = "result-sheet-border" style="width:96%; border: solid 3px;   margin:auto; padding:1%">
 
               <div class="row mb-2" style=" height:auto; width:96.7% ; margin:auto; padding:1%;">
-                <div class="mx-1" style="width:20%; "><img style="width:100%; max-height:130px " src= "/images/batch.jpeg" /></div>
+                <div class="mx-1" style="width:20%; "><img style="width:100%; max-height:130px " :src= "assessments.schoolBatch" /></div>
                 <div class="mx-1" style="width:55%; text-align:center">
                   <p> 
                     <h2>{{assessments.schoolName}}</h2>
@@ -338,7 +338,7 @@
                   </table>
                 </div>
 
-                <div class="mx-1" style="width:75%">
+                <div class="mx-1" style="width:70%">
                   <table border="2" style="width:100%; margin-top:0.5em">
                     <tr style="text-align:center"><th class="">CLASS TEACHER COMMENT</th></tr>
                     <tr ><td><textarea style="width:100%" v-model="form_master_comment" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{form_master_comment}}</span></td></tr>
@@ -351,8 +351,8 @@
                   <br /> <strong>A MESSAGE TO THE PARENTS:</strong>
                   <p><textarea style="width:100%" v-model="message_to_parent" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{message_to_parent}}</span></p>
                 </div>
-                <div class="circle" style="width:23%; padding:0.3em; font-size:20pt; transform: rotate(-45deg); text-align:center; border: solid 1px; margin-top:3em;">
-                  SCHOOL STAMP
+                <div  style="width:23%; padding:0.3em; font-size:20pt; transform: rotate(-45deg); text-align:center;  margin-top:0.5em; margin-left:5%">
+                  <img style="width:100%; max-height:130px " :src= "assessments.schoolStamp" />
                 </div>
 
               </div>

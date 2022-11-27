@@ -461,7 +461,29 @@ export default {
     updateSchool() {
       this.$Progress.start();
       // console.log('Editing data');
-      this.form.put('api/schools/' + this.form.id)
+      //this.form.put('api/schools/' + this.form.id)
+
+
+
+
+        let formData = new FormData();
+        formData.append('id', this.form.id);
+        formData.append('name', this.form.name);
+        formData.append('address', this.form.address);
+        formData.append('phone_no_1', this.form.phone_no_1);
+        formData.append('phone_no_2', this.form.phone_no_2);
+        formData.append('email_1', this.form.email_1);
+        formData.append('email_2', this.form.email_2);
+        formData.append('schoolBatch', this.schoolBatchObj);
+        formData.append('schoolStamp', this.schoolStampObj);
+     
+
+        axios.post('api/schools', formData, {
+            headers: {
+              'Content-Type': "multipart/form-data; charset=utf-8; boundary=" + Math.random().toString().substring(2)
+            }
+          }
+        )
         .then((response) => {
           // success
           $('#addNew').modal('hide');

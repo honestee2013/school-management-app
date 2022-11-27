@@ -23,6 +23,15 @@ class School extends Model implements HasMedia
         'id'
     ];
 
+    protected $fillable = [
+        "name", 
+        "address",
+        "phone_no_1",
+        "phone_no_2",
+        "email_1",
+        "email_2"
+    ];
+
     /**
      * The attributes that should be cast to native types.
      *
