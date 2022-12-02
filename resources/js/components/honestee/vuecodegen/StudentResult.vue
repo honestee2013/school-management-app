@@ -121,6 +121,7 @@
           <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-show="(editResultMode) && ((user && result_scope == 'Student') || isSettings)" @click="saveResult()"> Save </button>
           
           <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3" v-show="( result_scope == 'School' ? true : (result_scope == 'Student' && (Object.keys(assessments).length > 0))  )" @click="showSettings()"> Settings </button>
+          <button type="submit" class="btn btn-primary my-sm-2 ml-2 my-3"  @click="printPreview = true; print()"> Print </button>
           
         </form>
   </nav>
@@ -187,8 +188,8 @@
   
     <div class="container table-responsive py-5" style="background:gray; width:100% " v-show="(!isSettings)">
   
-      <div class="col" id = "result-sheet" style=" background:white; max-width: 900px; min-width:900px; min-height: 1000px; margin:auto; padding:1%;">
-        <div class="row my-3" id = "result-sheet-border" style="width:96%; border: solid 3px;   margin:auto; padding:1%">
+      <div class="col" id = "result-sheet" style=" background:white; max-width: 1000px; min-width:1000px; min-height: 1470px; margin:auto; padding:1%;">
+        <div class="row my-3" id = "result-sheet-border" style="height:1470px; width:96%; border: solid 3px;   margin:auto; padding:1%">
 
               <div class="row mb-2" style=" height:auto; width:96.7% ; margin:auto; padding:1%;">
                 <div class="mx-1" style="width:20%; "><img style="width:100%; max-height:130px " :src= "assessments.schoolBatch" /></div>
@@ -203,7 +204,7 @@
 
                 </div>
                 <div class="mx-1" style="width:20%; ">
-                  <!---<img style="width:100%; max-height:130px " src= "/images/passpor.jpg" /> -->
+                  <!--<img style="width:100%; max-height:130px " src= "/images/passport.jpg" />-->
                   <i style="font-size:8em; color:gray" class="fa fa-user"></i> 
                 </div>
               </div>  
@@ -211,58 +212,58 @@
               <div class="row mb-2" style="border-top: solid 2px; border-bottom: solid 2px; height:auto; width:96.7% ; margin:auto; padding:1%;">
                 <div class="mx-1" style="width:32.3%">
                   <table border="2" style="width:100%; height:100%">
-                    <tr style=""><th class="">Session</th><td> {{ resultYear }} </td></tr>
-                    <tr style=""><th class="">Term</th><td> {{resultTerm}} </td></tr>
-                    <tr style=""><th class="">Resumption Date</th> <td> {{assessments.schoolResumptionDate}} </td></tr>
+                    <tr style=""><th :style="paddingLft" >Session</th><td :style="paddingLft"> {{ resultYear }} </td></tr>
+                    <tr style=""><th :style="paddingLft">Term</th><td :style="paddingLft"> {{resultTerm}} </td></tr>
+                    <tr style=""><th :style="paddingLft">Resumption Date</th> <td :style="paddingLft"> {{assessments.schoolResumptionDate}} </td></tr>
                   </table>
                 </div>
                 <div class="mx-1" style="width:32.3%">
                   <table border="2" style="width:100%; height:100%">
-                    <tr style=""><th class="">Classroom name</th><td> Play group {{assessments.classroomName}} </td></tr>
-                    <tr style=""><th class="">No. of Students</th><td> {{assessments.classNoOfStudents}} </td></tr>
-                    <tr style=""><th class="">Form-master's Initials</th><td> {{assessments.classFormMaster}} </td></tr>
+                    <tr style=""><th :style="paddingLft">Classroom name</th><td :style="paddingLft"> {{assessments.classroomName}} </td></tr>
+                    <tr style=""><th :style="paddingLft">No. of Students</th><td :style="paddingLft"> {{assessments.classNoOfStudents}} </td></tr>
+                    <tr style=""><th :style="paddingLft">Form-master's Initials</th><td :style="paddingLft"> {{assessments.classFormMaster}} </td></tr>
                   </table>
                 </div>
                 <div class="mx-1" style="width:32.3%">
                   <table border="2" style="width:100%; height:100%">
-                    <tr style="text-align:center"><th class=""> Aminu Abdulkadir Mohammed{{assessments.studentFullName}} </th></tr>
-                    <tr style="text-align:center"><th class=""> {{assessments.studentRegNo}} </th></tr>
-                    <tr style="text-align:center"><th class=""> {{assessments.classPosition}} </th></tr>
+                    <tr style="text-align:center"><th :style="paddingLft"> {{assessments.studentFullName}} </th></tr>
+                    <tr style="text-align:center"><th :style="paddingLft"> {{assessments.studentRegNo}} </th></tr>
+                    <tr style="text-align:center"><th :style="paddingLft"> {{assessments.classPosition}} </th></tr>
                   </table>
                 </div>
               </div>
 
-              <div class="col-8">
+              <div class="col-9">
                 
                   <table border="2" style="width:100%; border-collapse: collapse;">
                       <tr style="height:100px">
-                        <td >SCHOOL SUBJECTS</td>
-                        <th class="vert">CA</th>
-                        <th class="vert">EXAMS</th>
-                        <th class="vert">TOTAL</th>
-                        <th class="vert">GRADE</th>
+                        <th style="padding:1em; min-width: 210px;  font-size: 10pt ;">SCHOOL SUBJECTS</th>
+                        <th :style="verticalPrintStyle">CA</th>
+                        <th :style="verticalPrintStyle">EXAMS</th>
+                        <th :style="verticalPrintStyle">TOTAL</th>
+                        <th :style="verticalPrintStyle">GRADE</th>
 
-                        <th class="vert">POSITION</th>
+                        <th :style="verticalPrintStyle">POSITION</th>
 
-                        <th class="vert">HIGHEST</th>
-                        <th class="vert">LOWEST</th>
-                        <th class="vert">AVERAGE</th>
+                        <th :style="verticalPrintStyle">HIGHEST</th>
+                        <th :style="verticalPrintStyle">LOWEST</th>
+                        <th :style="verticalPrintStyle">AVERAGE</th>
                       </tr>
                     <tbody>
                         <tr v-for="(assessment, key) in assessments" :key="key" v-show="assessment.subject"> 
-                          <th >{{ assessment.subject }}</th>
+                          <th :style="paddingLft">{{ assessment.subject }}</th>
 
-                          <td  >{{ assessment.ca }}</td>
-                          <td  >{{ assessment.exams }}</td>
-                          <td  >{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.total }}</td>
-                          <td  >{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.grade }}</td>
+                          <td  :style="paddingLft">{{ assessment.ca }}</td>
+                          <td  :style="paddingLft">{{ assessment.exams }}</td>
+                          <td  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.total }}</td>
+                          <td  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.grade }}</td>
 
-                          <td  >{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.subjectPosition }}</td>
+                          <td  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.subjectPosition }}</td>
 
 
-                          <td  >{{ assessment.max }}</td>
-                          <td  >{{ assessment.min }}</td>
-                          <td  >{{ assessment.ave }}</td>
+                          <td  :style="paddingLft">{{ assessment.max }}</td>
+                          <td  :style="paddingLft">{{ assessment.min }}</td>
+                          <td  :style="paddingLft">{{ assessment.ave }}</td>
 
                         </tr>
                     
@@ -270,42 +271,42 @@
                   </table>
               </div>
 
-              <div class="col-4">
+              <div class="col-3">
                 <table border="2" style="width:100%">
                     <thead>
                       <tr>
-                        <th colspan = "2" style = "text-align:center; font-size:12pt"> EFFECTIVE SKILLS </th>
+                        <th colspan = "2" style = "text-align:center; font-size:10pt"> EFFECTIVE SKILLS </th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr><th>PUNCTUALITY</th><td><select v-model="effective_punctuality" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_punctuality}}</span></td></tr>
-                      <tr><th>POLITENESS</th><td><select v-model="effective_politeness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_politeness}}</span></td></tr>
-                      <tr><th>NEATNESS</th><td><select v-model="effective_neatness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_neatness}}</span></td></tr>
-                      <tr><th>HONESTY</th><td><select v-model="effective_honesty" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_honesty}}</span></td></tr>
-                      <tr><th>LEADERSHIP SKILL</th><td><select v-model="effective_leadership_skill" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_leadership_skill}}</span></td></tr>
-                      <tr><th>COOPERATION</th><td><select v-model="effective_cooperation" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_cooperation}}</span></td></tr>
-                      <tr><th>ATTENTIVENESS</th><td><select v-model="effective_attentiveness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_attentiveness}}</span></td></tr>
-                      <tr><th>PERSEVERANCE</th><td><select v-model="effective_perseverance" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_perseverance}}</span></td></tr>
-                      <tr><th>ATTITUDE TO WORK</th><td><select v-model="effective_attitude_to_work" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_attitude_to_work}}</span></td></tr>
+                      <tr><th :style="paddingLft2">PUNCTUALITY</th><td :style="paddingLft2"><select v-model="effective_punctuality" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_punctuality}}</span></td></tr>
+                      <tr><th :style="paddingLft2">POLITENESS</th><td :style="paddingLft2"><select v-model="effective_politeness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_politeness}}</span></td></tr>
+                      <tr><th :style="paddingLft2">NEATNESS</th><td :style="paddingLft2"><select v-model="effective_neatness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_neatness}}</span></td></tr>
+                      <tr><th :style="paddingLft2">HONESTY</th><td :style="paddingLft2"><select v-model="effective_honesty" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_honesty}}</span></td></tr>
+                      <tr><th :style="paddingLft2">LEADERSHIP SKILL</th><td :style="paddingLft2"><select v-model="effective_leadership_skill" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_leadership_skill}}</span></td></tr>
+                      <tr><th :style="paddingLft2">COOPERATION</th><td :style="paddingLft2"><select v-model="effective_cooperation" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_cooperation}}</span></td></tr>
+                      <tr><th :style="paddingLft2">ATTENTIVENESS</th><td :style="paddingLft2"><select v-model="effective_attentiveness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_attentiveness}}</span></td></tr>
+                      <tr><th :style="paddingLft2">PERSEVERANCE</th><td :style="paddingLft2"><select v-model="effective_perseverance" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_perseverance}}</span></td></tr>
+                      <tr><th :style="paddingLft2">ATTITUDE TO WORK</th><td :style="paddingLft2"><select v-model="effective_attitude_to_work" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{effective_attitude_to_work}}</span></td></tr>
                     </tbody>
                   </table>
 
                   <table border="2" style="width:100%; margin-top:1em">
                     <thead>
                       <tr>
-                        <th colspan = "2" style = "text-align:center; font-size:12pt"> PSYCHOMOTOR SKILLS </th>
+                        <th colspan = "2" style = "text-align:center; font-size:10pt"> PSYCHOMOTOR SKILLS </th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr><th>HANDWRITING</th><td><select v-model="psychomotor_handwriting" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_handwriting}}</span></td></tr>
-                      <tr><th>VERBAL FLUENCY</th><td><select v-model="psychomotor_verbal_fluency" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_verbal_fluency}}</span></td></tr>
-                      <tr><th>SPORT</th><td><select v-model="psychomotor_sport" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_sport}}</span></td></tr>
-                      <tr><th>HANDLING TOOLS</th><td><select v-model="psychomotor_handling_tools" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_handling_tools}}</span></td></tr>
-                      <tr><th>DRAWING AND PAINTING</th><td><select v-model="psychomotor_drawing_and_painting" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_drawing_and_painting}}</span></td></tr>
-                      <tr><th>COOPERATION</th><td><select v-model="psychomotor_cooperation" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_cooperation}}</span></td></tr>
-                      <tr><th>ATTENTIVENESS</th><td><select v-model="psychomotor_attentiveness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_attentiveness}}</span></td></tr>
-                      <tr><th>PERSEVERANCE</th><td><select v-model="psychomotor_perseverance" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_perseverance}}</span></td></tr>
-                      <tr><th>ATTITUDE TO WORK</th><td><select v-model="psychomotor_attitude_to_work" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_attitude_to_work}}</span></td></tr>
+                      <tr><th :style="paddingLft2">HANDWRITING</th><td :style="paddingLft2"><select v-model="psychomotor_handwriting" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_handwriting}}</span></td></tr>
+                      <tr><th :style="paddingLft2">VERBAL FLUENCY</th><td :style="paddingLft2"><select v-model="psychomotor_verbal_fluency" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_verbal_fluency}}</span></td></tr>
+                      <tr><th :style="paddingLft2">SPORT</th><td :style="paddingLft2"><select v-model="psychomotor_sport" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_sport}}</span></td></tr>
+                      <tr><th :style="paddingLft2">HANDLING TOOLS</th><td :style="paddingLft2"><select v-model="psychomotor_handling_tools" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_handling_tools}}</span></td></tr>
+                      <tr><th :style="paddingLft2">DRAWING AND PAINTING</th><td :style="paddingLft2"><select v-model="psychomotor_drawing_and_painting" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_drawing_and_painting}}</span></td></tr>
+                      <tr><th :style="paddingLft2">COOPERATION</th><td :style="paddingLft2"><select v-model="psychomotor_cooperation" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_cooperation}}</span></td></tr>
+                      <tr><th :style="paddingLft2">ATTENTIVENESS</th><td :style="paddingLft2"><select v-model="psychomotor_attentiveness" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_attentiveness}}</span></td></tr>
+                      <tr><th :style="paddingLft2">PERSEVERANCE</th><td :style="paddingLft2"><select v-model="psychomotor_perseverance" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_perseverance}}</span></td></tr>
+                      <tr><th :style="paddingLft2">ATTITUDE TO WORK</th><td :style="paddingLft2"><select v-model="psychomotor_attitude_to_work" v-if="editResultMode"><option v-for="score in 5"> {{ score }}</option></select> <span v-if="!editResultMode">{{psychomotor_attitude_to_work}}</span></td></tr>
                     </tbody>
                   </table>
 
@@ -313,16 +314,16 @@
                   <table border="2" style="width:100%; margin-top:1em">
                     <thead>
                       <tr>
-                        <th colspan = "2" style = "text-align:center; font-size:12pt">GRADING SYSTEM</th>
+                        <th colspan = "2" style = "text-align:center; font-size:10pt">GRADING SYSTEM</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr><th>A</th><td>75-100</td></tr>
-                      <tr><th>B</th><td>70-74</td></tr>
-                      <tr><th>C</th><td>50-59</td></tr>
-                      <tr><th>D</th><td>45-49</td></tr>
-                      <tr><th>E</th><td>40-44</td></tr>
-                      <tr><th>F</th><td>0-39</td></tr>
+                      <tr><th :style="paddingLft2">A</th><td :style="paddingLft2">75-100</td></tr>
+                      <tr><th :style="paddingLft2">B</th><td :style="paddingLft2">70-74</td></tr>
+                      <tr><th :style="paddingLft2">C</th><td :style="paddingLft2">50-59</td></tr>
+                      <tr><th :style="paddingLft2">D</th><td :style="paddingLft2">45-49</td></tr>
+                      <tr><th :style="paddingLft2">E</th><td :style="paddingLft2">40-44</td></tr>
+                      <tr><th :style="paddingLft2">F</th><td :style="paddingLft2">0-39</td></tr>
                     </tbody>
                   </table>
 
@@ -331,25 +332,25 @@
 
               <div class="row my-2" style="border-top: solid 2px; border-bottom: solid 2px; height:auto; width:96.7% ; margin:auto; padding:1%;">
                 <div class="mx-1" style="width:100%">
-                  <table border="2" style="width:100%">
-                    <tr style=""> 
-                      <th rowspan = "2" class="">SUMMARY</th> <th> TOTAL SCORE </th> <th> AVERAGE SCORE </th> <th> GRADE </th></tr>
-                      <tr style=""> <td> {{ assessments.grandTotal }} </td>  <td> {{ assessments.grandTotalAve }} </td> <td> {{ assessments.grandTotalGrade }} </td> </tr>
+                  <table border="2" style="width:100%; font-size: 10pt ;">
+                    <tr style="text-align:center"> 
+                      <th rowspan = "2" style="padding: 0.3em">SUMMARY</th> <th style="padding: 0.3em"> TOTAL SCORE </th> <th style="padding: 0.3em"> AVERAGE SCORE </th> <th style="padding: 0.3em"> GRADE </th></tr>
+                      <tr style="text-align:center"> <td style="padding: 0.3em"> {{ assessments.grandTotal }} </td>  <td style="padding: 0.3em"> {{ assessments.grandTotalAve }} </td> <td style="padding: 0.3em"> {{ assessments.grandTotalGrade }} </td> </tr>
                   </table>
                 </div>
 
-                <div class="mx-1" style="width:70%">
+                <div class="mx-1" style="width:70%; ">
                   <table border="2" style="width:100%; margin-top:0.5em">
-                    <tr style="text-align:center"><th class="">CLASS TEACHER COMMENT</th></tr>
-                    <tr ><td><textarea style="width:100%" v-model="form_master_comment" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{form_master_comment}}</span></td></tr>
+                    <tr style="text-align:center"><th style="padding: 0.3em;  font-size: 10pt ;">CLASS TEACHER COMMENT</th></tr>
+                    <tr ><td :style="paddingLft"><textarea style="width:100%" v-model="form_master_comment" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{form_master_comment}}</span></td></tr>
                   </table>
                   <table border="2" style="width:100%; margin-top:0.5em">
-                    <tr style="text-align:center"><th class="">PRINCIPAL/HEADTEACHER COMMENT</th></tr>
-                    <tr style=""><td><textarea style="width:100%" v-model="principal_comment" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{principal_comment}}</span></td></tr>
+                    <tr style="text-align:center;"><th style="padding: 0.3em;  font-size: 10pt ;">PRINCIPAL/HEADTEACHER COMMENT</th></tr>
+                    <tr ><td :style="paddingLft"><textarea style="width:100%" v-model="principal_comment" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{principal_comment}}</span></td></tr>
                   </table>
                   
-                  <br /> <strong>A MESSAGE TO THE PARENTS:</strong>
-                  <p><textarea style="width:100%" v-model="message_to_parent" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{message_to_parent}}</span></p>
+                  <br /> <strong style=" font-size: 10pt ;">A MESSAGE TO THE PARENTS:</strong>
+                  <p ><textarea style="width:100%" v-model="message_to_parent" v-if="editResultMode"></textarea> <span v-if="!editResultMode">{{message_to_parent}}</span></p>
                 </div>
                 <div  style="width:23%; padding:0.3em; font-size:20pt; transform: rotate(-45deg); text-align:center;  margin-top:0.5em; margin-left:5%">
                   <img style="width:100%; max-height:130px " :src= "assessments.schoolStamp" />
@@ -602,7 +603,8 @@
     data() {
       return {
   
-        
+       
+
         effective_punctuality: 0,
         effective_politeness: 0,
         effective_neatness: 0,
@@ -955,7 +957,20 @@
   
       print() {
         this.$Progress.start();
-        this.$htmlToPaper('printPaper');
+
+        this.printPreview = true;
+        console.log('Printing preview '+this.printPreview);
+
+
+        //this.$htmlToPaper('result-sheet');
+        this.$htmlToPaper('result-sheet', null, () => {
+          
+          this.printPreview = false;
+          console.log('Printing completed or was cancelled!');
+          console.log('Printing preview '+this.printPreview);
+
+        });
+
         this.$Progress.finish();
       },
   
@@ -1396,6 +1411,7 @@
       this.loadUsers();
       this.loadSubjects();
       this.$Progress.finish();*/
+      //this.print();
     },
   
   
@@ -1406,7 +1422,32 @@
     },
   
   
-    computed: {},
+    computed: {
+      verticalPrintStyle () {
+        return {
+          'transform': 'rotate(270deg)',
+          'max-width': 'auto',
+          'font-size': '0.9em',
+        };
+      },
+
+      paddingLft () {
+        return {
+          'padding': '0.25em 1em 0.25em 1em',
+          'font-size': '0.98em',
+        };
+      },
+
+      paddingLft2 () {
+        return {
+          'padding': '0.25em 1em 0.25em 1em',
+          'font-size': '0.8em',
+        };
+      },
+
+
+
+    },
   
   
   }
@@ -1414,46 +1455,17 @@
   
   </script>
   
-  <style>
-  @media screen and (min-width: 990px) {
-    #printPaper {
-      margin-left: -22.2%;
-      padding: 0% 1% 3% 1%;
-      width: 100%;
-    }
-  }
-  
-  
-  
-  th.vert{
-    transform: rotate(180deg);
-    white-space: nowrap;
-    writing-mode: vertical-rl;
-    line-height: 1;
-    position: relative;
-    padding: 0.7em;
-  }
-  
-  
-  .circle {
-      background-color:#fff;
-      border:1px solid red;    
-      height:100px;
-      border-radius:50%;
-      -moz-border-radius:50%;
-      -webkit-border-radius:50%;
-      width:100px;
-  }
-  
-  th, td {
-    padding-left: 1em
-  }
+
+<style>
+
+
+</style>
+
+
   
   
   
   
-  
-  </style>
   
   
   

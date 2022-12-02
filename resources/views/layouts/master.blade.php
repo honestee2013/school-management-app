@@ -11,6 +11,8 @@
   
 
   <link rel="stylesheet" href="{{ mix('/css/app.css') }}">
+
+
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper" id="app">

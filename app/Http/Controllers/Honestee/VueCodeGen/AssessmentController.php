@@ -61,8 +61,11 @@ class AssessmentController extends Controller
        
             //Classroom::find($assessments->first()->classroom_id)->users()->get();
             //$userAssessments = $this->getUserAssessments($request['id'], $request['term'] , $request['year']);
-            $classroomId = User::where("id", $request['id'])->first()->currentClassroom()->first()->id;
-            $classroomAssessments = $this->getClassroomAssessments($classroomId, $request['term'] , $request['year']);
+            $classroom = User::where("id", $request['id'])->first()->currentClassroom()->first();
+            if(!$classroom)
+                return $this->sendResponse(null, 'No classroom associated with the user id: '.$request['id']." found!");
+
+            $classroomAssessments = $this->getClassroomAssessments($classroom->id, $request['term'] , $request['year']);
             //$this->classroomSubjects = Classroom::find($classroomId)->subjects;
             //$classroomAssessments = $this->getClassroomAssessments($userAssessments->first()->classroom_id, $request['term'] , $request['year']);
             
