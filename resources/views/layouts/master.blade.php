@@ -57,7 +57,8 @@
         <router-link to="/profile">
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
               <div class="image">
-                <img src="{{ asset('/images/profile.png') }}" class="img-circle elevation-2" alt="User Image">
+                <img src="{{ Auth::user()->profile_picture }}" class="img-circle elevation-2" alt="User Image">
+                <!--<img src="{{ asset('/images/profile.png') }}" class="img-circle elevation-2" alt="User Image">-->
                 <!--<img src="{{ auth()->user()->photo }}" class="img-circle elevation-2" alt="User Image">-->
               </div>
               <div class="info">
@@ -116,6 +117,8 @@
     </div>
     {{-- Default to the left --}}
     <strong>Copyright &copy; 2014-2019 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+    {{ Auth::user()->profile_picture }}
+
   </footer>
 </div>
 {{-- ./wrapper --}}

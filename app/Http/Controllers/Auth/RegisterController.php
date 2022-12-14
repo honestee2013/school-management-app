@@ -70,6 +70,7 @@ class RegisterController extends Controller
         $fields = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:App\Models\Honestee\VueCodeGen\User,email'],
+            'gender' => ['required', 'string', 'max:6'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
 
@@ -89,7 +90,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        
+       
         $code = null;
         $roleName = $data['role'];
         if($roleName == 'school-owner')
@@ -113,16 +114,11 @@ class RegisterController extends Controller
         $userData = [
             'name' => $data['name'],
             'email' => $data['email'],
+            'gender' => $data['gender'],
             'password' => Hash::make($data['password']),
             'user_number' => $userNumber,
         ];
         $user = User::create($userData);
-
-        // Assigning Role by default user role
-        //$role = Role::where('name', $roleName)->first();
-        //$generalRole = Role::where('name', $generalRoleName)->first();
-        //$user->assignRole($role);
-        //$user->assignRole($generalRole); 
 
         $user->syncRoles([$roleName, $generalRoleName]);
 
@@ -134,24 +130,6 @@ class RegisterController extends Controller
             $code->save();
         }
 
-
-        //$userNumber = $this->createUserNumber('STA'); // For staff
-        //$user->update(['user_number', $userNumber]);
-
-        //redirect()->away("google.com");
-
-       // exit(
-           // "<a href='".Tenant::current()->domain.":8000'> www.".Tenant::current()->domain." </a>"
-       // );
-        
-       //$this->redirectTo = "http://" .Tenant::current()->domain.":8000'";
-        //generates a url for domain.app.url/login
-       // URL::route('employee.login');
-
-        //redirects to domain.app.url/login
-        //return Redirect::route("http://" .Tenant::current()->domain.":8000");
-
-        //Redirect::route('registration-finished', ['domain' => Tenant::current()->domain]);
         if($data['role'] == 'school-owner'){
             exit('
                 <div class="alert alert-danger col-12 col-md-10 mx-md-5 my-md-5" role="alert">
@@ -165,11 +143,6 @@ class RegisterController extends Controller
                 </div>
             ');
         }
-
-        // Assigning Role by default user role
-
-        // $role = Role::where('name', 'User')->first();
-        // $user->assignRole($role);
 
         return $user;
     }

@@ -18,9 +18,56 @@
                                 <div class="tab-pane" id="activity">
                                     <h3 class="text-center">Display User Activity</h3>
                                 </div>
+
+
+
+
+
+
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+                                
+
+                                <div class="text-center" >
+                                    <img :src="form.profile_picture" class="rounded-circle img-thumbnail" alt="profile image" style = "width:200px; height:200px;">
+                                </div>
+                                
                                 <!-- Setting Tab -->
                                 <div class="tab-pane active show" id="settings">
-                                    <form @click.prevent="updateInfo" class="form-horizontal">
+                                    <form @submit.prevent="updateInfo" class="form-horizontal">
                                         <div class="form-group">
                                             <label for="inputName" class="col-sm-2 control-label">Name</label>
 
@@ -37,6 +84,54 @@
                                                 <has-error :form="form" field="email"></has-error>
                                             </div>
                                         </div>
+
+                                        <div class="form-group">
+                                            <label for="inputPhone" class="col-sm-2 control-label">Phone</label>
+
+                                            <div class="col-sm-12">
+                                                <input type="phone" v-model="form.phone" class="form-control" id="inputPhone" placeholder="Phone"  :class="{ 'is-invalid': form.errors.has('email') }">
+                                                <has-error :form="form" field="phone"></has-error>
+                                            </div>
+                                        </div>
+
+
+
+            <div class="form-group">
+                <label for="gender" class="col-sm-2 control-label"> Gender </label>
+                <div class="col-sm-12">
+                    <select v-model="form.gender" name="gender" class="form-control" id = "gender" >
+                        <option> Male </option>
+                       <option> Female </option>
+                    </select>
+                </div>    
+                <has-error :form="form" field="gender"></has-error>
+            </div>
+
+
+            <label for="profilePicture" class="col-sm-2 control-label">Profile picture</label> 
+            <div class="col-sm-12">
+    
+                <div class="form-group">
+                    <input type="file" class="custom-file-inpu" id="profilePicture" 
+                    :class="{ 'is-invalid': form.errors.has('profilePicture') }"
+                    ref="file" @change="handleFileObject"
+                    accept="image/*"
+                    >
+                    <has-error :form="form" field="profilePicture"></has-error>
+                </div>
+            </div>
+
+            <div class="col-sm-12" style="background-color:gray; border: solid dashed; width:100%; height: 5em">
+
+            </div>
+
+
+
+
+
+
+
+                                        
                                         <div class="form-group">
                                             <div class="col-md-12">
                                                 <button type="submit" class="btn btn-success">Update Profile</button>
@@ -122,9 +217,13 @@
                     id:'',
                     name : '',
                     email: '',
+                    phone: '',
+                    gender: 'Male',
+                    profile_picture: '',
                     password: '',
                     created_at: ''
-                })
+                }),
+                profilePictureObj: '',
             }
         },
         mounted() {
@@ -137,13 +236,39 @@
                 if(this.form.password == ''){
                     this.form.password = undefined;
                 }
-                this.form.put('api/profile')
+
+                if(this.form.gender == undefined){
+                    this.form.gender =  '';
+                }
+
+                let formData = new FormData();
+                formData.append('id', this.form.id);
+                formData.append('name', this.form.name);
+                formData.append('email', this.form.email);
+                formData.append('gender', this.form.gender);
+                formData.append('phone', this.form.phone);
+                formData.append('profilePicture', this.profilePictureObj);
+
+                formData.append('password', this.form.password);
+                formData.append('created_at', this.form.created_at);
+
+
+                //this.form.put('api/profile')
+                axios.post('api/profile', formData, {
+                    headers: {
+                        'Content-Type': "multipart/form-data; charset=utf-8; boundary=" + Math.random().toString().substring(2)
+                    }
+                })
                 .then((data)=>{
                     this.$Progress.finish();
                     Toast.fire({
                         icon: 'success',
                         title: data.data.message
+
+                    }).then((result) => {
+                        window.location.reload();
                     });
+
                 })
                 .catch((data) => {
                     this.$Progress.fail();
@@ -178,7 +303,47 @@
                         title: 'Some error occured! Please try again'
                     });
                 });
+            },
+
+
+            handleFileObject(e) {
+                if(e.target.id == 'profilePicture'){
+
+
+
+
+                    if (e.target.files[0].size > 300000) {
+                        Toast.fire(
+                            'Error!',
+                            'This image is larger than 3KB! Please choose a smaller image and try again.',
+                            'error',
+                            9000
+                        );
+                        const file = document.getElementById('profilePicture');
+                        file.value = '';
+                    }else{
+                        this.profilePictureObj = e.target.files[0];
+                        console.log(this.profilePictureObj.size);
+                    }
+
+
+
+
+
+
+
+
+                    
+                    
+                } 
             }
+
+
+
+
+
+
+
         },
 
         created() {

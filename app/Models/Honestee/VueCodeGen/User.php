@@ -15,14 +15,18 @@ use App\Models\Honestee\VueCodeGen\Classroom;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\HasMedia;
+use URL;
 
 
-
-class User extends Authenticatable // implements MustVerifyEmail
+class User extends Authenticatable implements HasMedia // implements MustVerifyEmail
 {
     use UsesTenantConnection;
 
     use HasRoles;
+    use InteractsWithMedia;
+
 
     //use LaratrustUserTrait;
     use HasFactory, Notifiable, HasApiTokens;
@@ -33,8 +37,15 @@ class User extends Authenticatable // implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'user_number',
+        'name', 'email', 'gender', 'phone', 'password', 'user_number',
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['profile_picture'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -77,6 +88,22 @@ class User extends Authenticatable // implements MustVerifyEmail
 
     
 
+    public function getProfilePictureAttribute(){
+
+        $userImages = $this->getMedia("user-images");
+        for($i=0; $i < count($userImages); $i++){
+            if($userImages[$i]->name == "profilePicture"){
+                $url = $userImages[$i]->getUrl();
+                $url = str_replace("localhost", "localhost:8000", $url);
+                return $url;
+            } 
+        }
+
+        return URL::asset('/images/'. strtolower($this->gender).'ProfilePicture.png'); // Default file url
+
+    }
+
+    //$model->getFirstMediaUrl('image', 'resized') ?? asset('path/to/img');
 
     
 

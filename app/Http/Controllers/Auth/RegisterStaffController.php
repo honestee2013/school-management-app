@@ -67,6 +67,7 @@ class RegisterParentController extends Controller
             'website' => 'unique:Spatie\Multitenancy\Models\Tenant,database',
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'gender' => ['required', 'string', 'gender', 'max:6'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
@@ -84,6 +85,7 @@ class RegisterParentController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'gender' => $data['gender'],
             'password' => Hash::make($data['password']),
             'user_number' => $this->createUserNumber($data['role']),
             //'type' => 'admin',

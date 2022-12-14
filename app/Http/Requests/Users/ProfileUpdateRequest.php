@@ -25,7 +25,9 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:191',
-            'email' => 'required|string|email|max:191|unique:users,email,' . $this->user()->id
+            'phone' => 'numeric|digits:11|unique:users,phone,' . $this->user()->id,
+            'email' => 'required|string|email|max:191|unique:users,email,' . $this->user()->id,
+            'gender' => 'required|string|max:6',
         ];
     }
 }

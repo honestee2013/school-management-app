@@ -52,9 +52,15 @@ class UserController extends BaseController
         $user = User::create([
             'name' => $request['name'],
             'email' => $request['email'],
+            'gender' => $request['gender'],
+            'phone' => $request['phone'],
             'password' => Hash::make($request['password']),
             'type' => $request['type'],
         ]);
+
+        if(!empty(['profilePicture']))  
+            $user->addMedia($request['profilePicture'])->usingName('profilePicture')->toMediaCollection('user-images');  
+
 
         return $this->sendResponse($user, 'User Created Successfully');
     }
@@ -77,6 +83,14 @@ class UserController extends BaseController
         }
 
         $user->update($request->all());
+
+        $userImages = $user->getMedia("user-images");
+        for($i=0; $i < count($userImages); $i++){
+            if($userImages[$i]->name == "profilePicture" && !empty($request['profilePicture'])){
+                $userImages[$i]->delete();
+                $user->addMedia($request['profilePicture'])->usingName('profilePicture')->toMediaCollection('user-images');
+            } 
+        }
 
         return $this->sendResponse($user, 'User Information has been updated');
     }

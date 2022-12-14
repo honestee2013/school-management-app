@@ -8,6 +8,9 @@ use App\Http\Requests\Users\ProfileUpdateRequest;
 use App\Models\Honestee\VueCodeGen\User;
 use Illuminate\Support\Facades\Hash;
 
+use Illuminate\Http\Request;
+
+
 class ProfileController extends Controller
 {
     /**
@@ -46,12 +49,29 @@ class ProfileController extends Controller
      */
     public function updateProfile(ProfileUpdateRequest $request)
     {
+
         $user = auth('api')->user();
 
         $user->update([
             'name' => $request['name'], 
-            'email' => $request['email']
+            'email' => $request['email'],
+            'gender' => $request['gender'],
+            'phone' => $request['phone']
         ]);
+
+        $userImages = $user->getMedia("user-images");
+        if( count($userImages) ) {
+            for($i=0; $i < count($userImages); $i++){
+                if($userImages[$i]->name == "profilePicture" && !empty($request['profilePicture'])){
+                    $userImages[$i]->delete();
+                    $user->addMedia($request['profilePicture'])->usingName('profilePicture')->toMediaCollection('user-images');
+                } 
+            }
+        } else {
+            if(!empty(['profilePicture']))
+                $user->addMedia($request['profilePicture'])->usingName('profilePicture')->toMediaCollection('user-images');
+        }
+        
 
         $response = [
             'success' => true,
@@ -80,4 +100,32 @@ class ProfileController extends Controller
         ];
         return response()->json($response, 200);
     }
+
+
+
+
+/** 
+    * success response method.
+     *
+     * @param    $result
+     * @param    $message
+     *
+     * @return    \Illuminate\Http\Response
+     */
+    public function sendResponse($result, $message)
+    {
+        $response = [
+            'success'        => true,
+            'message'        => $message,
+            'data'           => $result,
+        ];
+        return response()->json($response, 200);
+    }
+
+
+
+
+
+
+
 }
