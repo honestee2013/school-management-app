@@ -1,64 +1,7 @@
 <template>
     <section class="content">
       <!-- PDF Generator begins -->
-      <html-pdf :show-layout="false" :float-layout="true" :enable-download="true" :preview-modal="true"
-        :paginate-elements-by-height="14000" filename="assessment_lists" :pdf-quality="2" :manual-pagination="true"
-        pdf-format="a4" pdf-orientation="landscape" pdf-content-width="100%" ref="html2Pdf">
-        <section id="printPaper" slot="pdf-content"
-          style=" width:100%; background-color: white;  padding: 0% 0.5% 40% 0.5%;">
-          <div style="margin-left: 0; width: 100%; ">
-            <h3 style="text-align:center; text-decoration: underline; padding: 1em; "> Assessment Lists</h3>
-            <table class="table table-bordered" style="width: 100%; ">
-              <thead>
-                <tr>
-                  <th>School Section</th>
-                  <th>Classroom</th>
-                  <th>User</th>
-                  <th>Subject</th>
-                  <th>Assessment Name</th>
-                  <th>Year</th>
-                  <th>Term</th>
-                  <th>Assessment Sequence</th>
-                  <th>Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(assessment, key, index) in assessments">
-                  <td>
-                    {{ (sections.find(a => a.id === assessment.section_id))? 
-                      (sections.find(a => a.id === assessment.section_id).name) : "" 
-                    }}
-                  </td>
-                  <td>
-                    {{ (classrooms.find(a => a.id === assessment.classroom_id))? 
-                      (classrooms.find(a => a.id === assessment.classroom_id).name) : "" 
-                    }}
-                  </td>
-                  <td> 
-                      {{ (users.find(a => a.id === assessment.user_id))? 
-                        (
-                          users.find(a => a.id === assessment.user_id).name + " (" +
-                          users.find(a => a.id === assessment.user_id).user_number + ")"                    
-                        ) : "" 
-                      }}
-                  </td>
-                  <td>
-                    {{ (subjects.find(a => a.id === assessment.subject_id))? 
-                      (subjects.find(a => a.id === assessment.subject_id).name) : "" 
-                    }}
-                  </td>
-  
-                  <td>{{ assessment.name }} </td>
-                  <td>{{ assessment.year }} </td>
-                  <td>{{ assessment.term }} </td>
-                  <td>{{ assessment.type }} </td>
-                  <td>{{ assessment.score }} </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </html-pdf>
+    
       <!-- PDF Generator Ends -->
   
       <!-- Container Begins -->
@@ -250,20 +193,17 @@
                         <th :style="verticalPrintStyle">AVERAGE</th>
                       </tr>
                     <tbody>
-                        <tr v-for="(assessment, key) in assessments" :key="key" v-show="assessment.subject"> 
-                          <th :style="paddingLft">{{ assessment.subject }}</th>
+                        <tr v-for="assessment in assessments"  v-show="assessment && assessment.hasOwnProperty('subject')"> 
+                          <th v-if="assessment" :style="paddingLft">{{ assessment.subject }}</th>
 
-                          <td  :style="paddingLft">{{ assessment.ca }}</td>
-                          <td  :style="paddingLft">{{ assessment.exams }}</td>
-                          <td  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.total }}</td>
-                          <td  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.grade }}</td>
-
-                          <td  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.subjectPosition }}</td>
-
-
-                          <td  :style="paddingLft">{{ assessment.max }}</td>
-                          <td  :style="paddingLft">{{ assessment.min }}</td>
-                          <td  :style="paddingLft">{{ assessment.ave }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ assessment.ca }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ assessment.exams }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.total }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.grade }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ (assessment.ca == '-' &&  assessment.exams)? "-": assessment.subjectPosition }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ assessment.max }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ assessment.min }}</td>
+                          <td v-if="assessment"  :style="paddingLft">{{ assessment.ave }}</td>
 
                         </tr>
                     
@@ -1043,8 +983,9 @@
         //console.log(JSON.stringify( url));
         try {
           this.form.get(url).then(assessments => {
-            if (assessments.data.data) {
-              this.totalRecords = assessments.data.data.total
+           //alert( JSON.stringify( assessments.data.data.data));
+            if (assessments.data.data.data) {
+              this.totalRecords = assessments.data.data.data.total
               this.assessments = assessments.data.data.data;
             }
           });
@@ -1260,6 +1201,8 @@
           try {
             var url = "api/users?user_number="+this.user_number;
             axios.get(url).then(user => {
+              //alert(JSON.stringify( user.data.data ));
+
               if (user.data.data) {
                 //console.log(user.data.data.data);
                 this.user = user.data.data;
@@ -1294,18 +1237,20 @@
                   url = "api/assessments?id="+this.user.id+"&term="+ this.resultTerm+"&year="+ this.resultYear+"&resultinfo=get&result_scope="+ this.result_scope+"&user_number="+ this.user_number;
                 
                 axios.get(url).then(assessments => {
+
                   if (assessments.data.data) {
+                   
+
                     //console.log(assessments.data.data);
                     if(!this.isSettings){
-                        this.assessments = assessments.data.data;
+                      //this.assessments = Object.values(assessments.data.data)[0];
+                      this.assessments = assessments.data.data;
                         //this.studentAssessments = assessments.data.data;
                         //this.studentAssessmentSubjects = assessments.data.data.keys();
                         //console.log(assessments.data.data.keys());
-                      //alert(JSON.stringify( this.assessments ));
-
                         
-      
-      
+                        //alert(JSON.stringify( this.assessments ));
+
                         if(assessments.data.data.classroomSubjects)
                           this.classroomSubjects = assessments.data.data.classroomSubjects;
       
@@ -1412,6 +1357,8 @@
       this.loadSubjects();
       this.$Progress.finish();*/
       //this.print();
+
+      this.loadAssessments();
     },
   
   
